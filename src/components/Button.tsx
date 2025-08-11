@@ -4,7 +4,7 @@ import { IconType } from "react-icons";
 interface ButtonProps {
   children: React.ReactNode;
   onClick: () => void;
-  variant?: "primary" | "secondary" | "success" | "danger" | "edit";
+  variant?: "primary" | "secondary" | "success" | "danger" | "edit" | "outline";
   type?: "button" | "submit" | "reset";
   disabled?: boolean;
   icon?: IconType;
@@ -18,7 +18,7 @@ const Button = ({
   disabled = false,
   icon: Icon,
 }: ButtonProps) => {
-  const baseClasses = "flex items-center justify-center font-bold py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors duration-200";
+  const baseClasses = "flex items-center justify-center font-medium py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors duration-200";
 
   const variantClasses = {
     primary: "bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500",
@@ -26,6 +26,7 @@ const Button = ({
     success: "bg-green-600 text-white hover:bg-green-700 focus:ring-green-500",
     danger: "bg-red-600 text-white hover:bg-red-700 focus:ring-red-500",
     edit: "bg-yellow-500 text-white hover:bg-yellow-600 focus:ring-yellow-400",
+    outline: "text-blue-600 bg-white hover:bg-blue-50 focus:ring-blue-500 border border-blue-600",
   };
 
   const disabledClasses = disabled ? "opacity-50 cursor-not-allowed" : "";
