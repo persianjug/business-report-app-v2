@@ -1,10 +1,14 @@
 "use client";
 
 import api from "@/utils/axios";
-import axios from "axios";
 import { useRouter } from "next/navigation";
+import Button from "./Button";
 
-export default function DeleteButton({ reportId }) {
+interface DeleteButtonProps {
+  reportId: string | number;
+}
+
+export default function DeleteButton({ reportId }: DeleteButtonProps) {
   const router = useRouter();
 
   const handleDelete = async () => {
@@ -12,7 +16,7 @@ export default function DeleteButton({ reportId }) {
       try {
         await api.delete(`/reports/${reportId}`);
         alert("報告書が正常に削除されました");
-        router.push("/reports"); // 削除後に一覧ページへ戻る
+        router.push("/reports");
       } catch (error) {
         console.error("報告書の削除に失敗しました:", error);
         alert("報告書の削除に失敗しました");
@@ -21,8 +25,6 @@ export default function DeleteButton({ reportId }) {
   };
 
   return (
-    <button onClick={handleDelete} className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded text-sm">
-      削除
-    </button>
+    <Button variant="danger" onClick={handleDelete}>削除</Button>
   );
 }

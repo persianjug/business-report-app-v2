@@ -10,6 +10,7 @@ export interface Report {
   otherInfo: OtherInfo;
   consultation: string;
   createdAt: string;
+  updateAt: string;
 }
 
 export interface CustomerInfo {
