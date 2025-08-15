@@ -1,8 +1,8 @@
-import React from "react";
+import React, { ReactNode } from "react";
 import { IconType } from "react-icons";
 
 interface ButtonProps {
-  children: React.ReactNode;
+  children: ReactNode;
   onClick: () => void;
   variant?: "primary" | "secondary" | "success" | "danger" | "edit" | "outline";
   type?: "button" | "submit" | "reset";

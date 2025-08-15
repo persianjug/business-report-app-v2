@@ -1,6 +1,7 @@
 import { UseFormRegister } from "react-hook-form";
 import ErrorMessage from "./ErrorMessage";
 import Label from "./Label";
+import { getInputClass } from "@/utils/classHelper";
 
 interface DateRangeInputProps {
   label: string;
@@ -9,6 +10,8 @@ interface DateRangeInputProps {
   endDateRegister: ReturnType<UseFormRegister<any>>;
   startDateError?: string;
   endDateError?: string;
+  className?: string;
+  width?: string;
 };
 
 const DateRangeInput = ({
@@ -18,7 +21,12 @@ const DateRangeInput = ({
   endDateRegister,
   startDateError,
   endDateError,
+  className,
+  width,
 }: DateRangeInputProps) => {
+  const startDateClass = getInputClass(startDateError, className, width);
+  const endDateClass = getInputClass(endDateError, className, width);
+
   return (
     <div>
       <Label text={label} isRequired={isRequired} />
@@ -26,15 +34,13 @@ const DateRangeInput = ({
         <input
           type="date"
           {...startDateRegister}
-          // className="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-          className="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-indigo-500 focus:border-indigo-500 bg-white"
+          className={startDateClass}
         />
         <span className="self-center">〜</span>
         <input
           type="date"
           {...endDateRegister}
-          // className="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-          className="flex-1 px-3 py-2 border border-gray-200 rounded-md shadow-sm focus:ring focus:ring-indigo-500 focus:border-indigo-500 bg-white"
+          className={endDateClass}
         />
       </div>
       <ErrorMessage message={startDateError} />

@@ -1,14 +1,17 @@
 import { UseFormRegisterReturn } from "react-hook-form";
 import ErrorMessage from "./ErrorMessage";
 import Label from "./Label";
+import { getInputClass } from "@/utils/classHelper";
 
-interface TextareaProps  {
+interface TextareaProps {
   label: string;
   id: string;
   isRequired?: boolean;
   rows?: number;
   register: UseFormRegisterReturn;
   errorMessage?: string;
+  className?: string;
+  width?: string;
 };
 
 const Textarea = ({
@@ -18,7 +21,11 @@ const Textarea = ({
   rows = 4,
   register,
   errorMessage,
+  className,
+  width,
 }: TextareaProps) => {
+  const inputClass = getInputClass(errorMessage, className, width);
+
   return (
     <div className="mt-8 mb-0">
       <Label text={label} isRequired={isRequired} />
@@ -26,7 +33,7 @@ const Textarea = ({
         id={id}
         rows={rows}
         {...register}
-        className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 bg-white"
+        className={inputClass}
       ></textarea>
       <ErrorMessage message={errorMessage} />
     </div>

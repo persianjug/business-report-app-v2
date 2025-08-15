@@ -31,28 +31,13 @@ const TaskInputItem = ({
           </button>
         )}
       </div>
-      {/* <h3 className="font-semibold text-gray-600">{`・タスク ${index + 1}`}</h3> */}
       <div className="space-y-4 p-8 pt-0 border border-gray-300 rounded-md shadow-sm bg-pink-50">
-        {/* <div className="space-y-4 border p-3 rounded-md"> */}
-        {/* <div className="flex justify-between items-center">
-          <h3 className="font-semibold text-gray-600">{`・タスク ${index + 1}`}</h3>
-          {isRemovable && (
-            <button
-              type="button"
-              onClick={onRemove}
-              className="text-red-500 hover:text-red-700 text-sm"
-            >
-              削除
-            </button>
-          )}
-        </div> */}
         <Input
           label="タスク名"
           id={`tasks.${index}.taskName`}
           isRequired={true}
           register={register(`tasks.${index}.taskName`)}
           errorMessage={errors.tasks?.[index]?.taskName?.message}
-          className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 bg-white"
         />
         <Textarea
           label="状況"

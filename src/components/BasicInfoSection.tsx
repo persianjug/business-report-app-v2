@@ -18,6 +18,7 @@ export const BasicInfoSection = ({ register, errors }: BasicInfoSectionProps) =>
         endDateRegister={register("endDate")}
         startDateError={errors.startDate?.message}
         endDateError={errors.endDate?.message}
+        width="w-48"
       />
     </FormSection>
   );

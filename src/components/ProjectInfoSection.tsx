@@ -28,7 +28,7 @@ export const ProjectInfoSection = ({ register, errors }: ProjectInfoSectionProps
         type="date"
         register={register("projectInfo.participationDate")}
         errorMessage={errors.projectInfo?.participationDate?.message}
-        className="mt-1 block w-48 border border-gray-300 rounded-md shadow-sm p-2"
+        width="w-48"
       />
       <Input
         label="参画人数"
@@ -37,7 +37,7 @@ export const ProjectInfoSection = ({ register, errors }: ProjectInfoSectionProps
         type="number"
         register={register("projectInfo.numberOfParticipants", { valueAsNumber: true })}
         errorMessage={errors.projectInfo?.numberOfParticipants?.message}
-        className="mt-1 block w-24 border border-gray-300 rounded-md shadow-sm p-2"
+        width="w-24"
       />
       <CommuteTimeInput
         label="通勤時間"
@@ -46,6 +46,7 @@ export const ProjectInfoSection = ({ register, errors }: ProjectInfoSectionProps
         minutesRegister={register("projectInfo.commuteMinutes", { valueAsNumber: true })}
         hoursError={errors.projectInfo?.commuteHours?.message}
         minutesError={errors.projectInfo?.commuteMinutes?.message}
+        width="w-24"
       />
       <Select
         label="勤務形態"
@@ -54,7 +55,7 @@ export const ProjectInfoSection = ({ register, errors }: ProjectInfoSectionProps
         register={register("projectInfo.workStyle")}
         errorMessage={errors.projectInfo?.workStyle?.message}
         options={WORK_STYLES}
-        className="mt-1 block w-72 border border-gray-300 rounded-md shadow-sm p-2"
+        width="w-64"
       />
       <Select
         label="ポジション"
@@ -63,7 +64,7 @@ export const ProjectInfoSection = ({ register, errors }: ProjectInfoSectionProps
         register={register("projectInfo.position")}
         errorMessage={errors.projectInfo?.position?.message}
         options={POSITIONS}
-        className="mt-1 block w-72 border border-gray-300 rounded-md shadow-sm p-2"
+        width="w-64"
       />
       <Input
         label="主要技術(言語、FW)"

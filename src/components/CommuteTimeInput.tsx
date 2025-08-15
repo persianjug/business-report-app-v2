@@ -1,6 +1,7 @@
 import { UseFormRegister } from "react-hook-form";
 import ErrorMessage from "./ErrorMessage";
 import Label from "./Label";
+import { getInputClass } from "@/utils/classHelper";
 
 interface CommuteTimeInputProps {
   label: string;
@@ -9,6 +10,8 @@ interface CommuteTimeInputProps {
   minutesRegister: ReturnType<UseFormRegister<any>>;
   hoursError?: string;
   minutesError?: string;
+  className?: string;
+  width?: string;
 };
 
 const CommuteTimeInput = ({
@@ -18,7 +21,12 @@ const CommuteTimeInput = ({
   minutesRegister,
   hoursError,
   minutesError,
+  className,
+  width,
 }: CommuteTimeInputProps) => {
+  const hoursClass = getInputClass(hoursError, className, width);
+  const minutesClass = getInputClass(minutesError, className, width);
+
   return (
     <div className="mt-8 mb-0">
       <Label text={label} isRequired={isRequired} />
@@ -26,13 +34,13 @@ const CommuteTimeInput = ({
         <input
           type="number"
           {...hoursRegister}
-          className="w-24 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+          className={hoursClass}
         />
         <span className="text-gray-500">時間</span>
         <input
           type="number"
           {...minutesRegister}
-          className="w-24 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+          className={minutesClass}
         />
         <span className="text-gray-500">分</span>
       </div>
