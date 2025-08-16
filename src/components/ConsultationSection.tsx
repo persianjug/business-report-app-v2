@@ -14,6 +14,7 @@ export const ConsultationSection = ({ register }: ConsultationSectionProps) => {
         label="相談内容"
         id="consultation"
         register={register("consultation")}
+        rows={6}
       />
     </FormSection>
   );

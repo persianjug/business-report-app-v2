@@ -43,14 +43,14 @@ const TaskInputItem = ({
           label="状況"
           id={`tasks.${index}.status`}
           isRequired={true}
-          rows={2}
+          rows={6}
           register={register(`tasks.${index}.status`)}
           errorMessage={errors.tasks?.[index]?.status?.message}
         />
         <Textarea
           label="問題・課題"
           id={`tasks.${index}.problem`}
-          rows={2}
+          rows={6}
           register={register(`tasks.${index}.problem`)}
           errorMessage={errors.tasks?.[index]?.problem?.message}
         />

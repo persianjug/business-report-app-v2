@@ -29,6 +29,7 @@ export const ProgressInfoSection = ({
         isRequired={true}
         register={register("overallProgress")}
         errorMessage={errors.overallProgress?.message}
+        rows={6}
       />
       <div className="mt-6 space-y-6">
         <div className="flex justify-between items-center mb-2">
@@ -53,6 +54,7 @@ export const ProgressInfoSection = ({
         isRequired={true}
         register={register("futurePlans")}
         errorMessage={errors.futurePlans?.message}
+        rows={6}
       />
     </FormSection>
   );
