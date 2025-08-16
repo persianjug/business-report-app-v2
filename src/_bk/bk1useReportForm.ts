@@ -1,11 +1,14 @@
+// "use client";
+
 // import { useState, useEffect } from "react";
 // import { useRouter } from "next/navigation";
 // import { useFieldArray, useForm } from "react-hook-form";
 // import { yupResolver } from "@hookform/resolvers/yup";
 // import { reportSchema, FormData } from "@/schemas/reportSchema";
 // import api from "@/utils/axios";
+// import { setReport, updateReport } from "@/lib/report";
 
-// export const useReportForm = () => {
+// export const useReportForm = (initialData: FormData | null = null) => {
 //   const router = useRouter();
 //   const [hasReports, setHasReports] = useState(false);
 //   const [step, setStep] = useState<"input" | "confirm">("input");
@@ -19,37 +22,7 @@
 //     formState: { errors, isDirty },
 //   } = useForm<FormData>({
 //     resolver: yupResolver(reportSchema),
-//     defaultValues: {
-//       startDate: "",
-//       endDate: "",
-//       customerInfo: {
-//         endClient: "",
-//         upperClient: "",
-//         industry: "",
-//         nearestStation: "",
-//       },
-//       projectInfo: {
-//         projectName: "",
-//         participationDate: "",
-//         numberOfParticipants: 0,
-//         commuteHours: 0,
-//         commuteMinutes: 0,
-//         workStyle: "",
-//         position: "",
-//         mainTechnology: "",
-//         database: "",
-//       },
-//       overallProgress: "",
-//       tasks: [{ taskName: "", status: "", problem: "" }],
-//       futurePlans: "",
-//       otherInfo: {
-//         customerStatus: "",
-//         salesInfo: "",
-//         healthStatus: "",
-//         vacationPlans: "",
-//       },
-//       consultation: "",
-//     },
+//     defaultValues: initialData,
 //   });
 
 //   const { fields, append, remove } = useFieldArray({
@@ -111,14 +84,23 @@
 //     setStep("confirm");
 //   };
 
-//   const handleApiSubmit = async () => {
+//   const handleApiPostSubmit = async () => {
 //     try {
-//       await api.post("/reports", formData);
+//       await setReport(formData);
 //       alert("報告書が正常に作成されました");
 //       router.push("/reports");
 //     } catch (error) {
-//       console.error("報告書の作成に失敗しました:", error);
 //       alert("報告書の作成に失敗しました");
+//     }
+//   };
+
+//   const handleApiPutSubmit = async () => {
+//     try {
+//       await updateReport(formData);
+//       alert("報告書が正常に更新されました");
+//       router.push("/reports");
+//     } catch (error) {
+//       alert("報告書の更新に失敗しました");
 //     }
 //   };
 
@@ -168,7 +150,8 @@
 //     handleAddTask,
 //     handleRemoveTask,
 //     onSubmitToConfirm,
-//     handleApiSubmit,
+//     handleApiPostSubmit,
+//     handleApiPutSubmit,
 //     handleLoadLatest,
 //     handleBackToList,
 //   };

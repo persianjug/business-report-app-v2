@@ -8,9 +8,22 @@ interface ConfirmationModalProps {
   title: string;
   message: string;
   children?: ReactNode;
+  confirmButtonText?: string;
+  cancelButtonText?: string;
+  variant?: "confirm" | "success" | "error";
 }
 
-const ConfirmationModal = ({ isOpen, onClose, onConfirm, title, message, children }: ConfirmationModalProps) => {
+const ConfirmationModal = ({
+  isOpen,
+  onClose,
+  onConfirm,
+  title,
+  message,
+  children,
+  confirmButtonText = "OK",
+  cancelButtonText = "キャンセル",
+  variant = "confirm",
+}: ConfirmationModalProps) => {
   const dialogRef = useRef<HTMLDialogElement>(null);
 
   // モーダル開閉の制御
@@ -25,10 +38,15 @@ const ConfirmationModal = ({ isOpen, onClose, onConfirm, title, message, childre
     }
   }, [isOpen]);
 
+  const getConfirmButtonVariant = () => {
+    if (variant === "error") return "danger";
+    if (variant === "success") return "success";
+    return "primary";
+  };
+
   return (
     <dialog
       ref={dialogRef}
-      // className="backdrop:bg-gray-500/75 rounded-lg shadow-xl p-0 w-full max-w-lg"
       className="backdrop:bg-gray-500/90 rounded-lg shadow-xl p-0 w-full max-w-lg fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
       onClose={onClose} // Escキーが押されたときにonCloseを呼び出す
     >
@@ -41,29 +59,24 @@ const ConfirmationModal = ({ isOpen, onClose, onConfirm, title, message, childre
         {children}
       </div>
 
-      <div className="px-6 py-4 mt-6 sm:flex sm:flex-row-reverse gap-x-6">
-        <Button variant="danger" onClick={onConfirm} className="w-full sm:ml-3 sm:w-auto">削除</Button>
-        <Button variant="outline" onClick={onClose} className="mt-3 w-full sm:mt-0 sm:w-auto">キャンセル</Button>
+      {/* <div className="px-6 py-4 mt-6 sm:flex sm:flex-row-reverse gap-x-6"> */}
+      <div className="px-6 py-4 mt-6 sm:flex sm:flex-row gap-x-4 justify-end">
+        <Button
+          variant="outline"
+          onClick={onClose}
+          className="mt-3 w-full sm:mt-0 sm:w-auto"
+        >
+          {cancelButtonText}
+        </Button>
+        {/* 確認/OKボタンをvariantに応じて表示 */}
+        <Button
+          variant={getConfirmButtonVariant()}
+          onClick={onConfirm}
+          className="w-full sm:ml-3 sm:w-auto"
+        >
+          {confirmButtonText}
+        </Button>
       </div>
-
-
-
-      {/* <div className="px-4 pt-5 pb-4 overflow-hidden bg-white sm:p-6">
-        <div className="sm:flex sm:items-start">
-          <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-            <h3 className="text-lg font-medium leading-6 text-gray-900">{title}</h3>
-
-            <div className="mt-2">
-              <p className="text-sm text-gray-500">{message}</p>
-              {children}
-            </div>
-          </div>
-        </div>
-      </div> */}
-      {/* <div className="px-6 py-4 bg-gray-50 sm:flex sm:flex-row-reverse">
-        <Button variant="danger" onClick={onConfirm} className="w-full sm:ml-3 sm:w-auto">削除</Button>
-        <Button variant="secondary" onClick={onClose} className="mt-3 w-full sm:mt-0 sm:w-auto">キャンセル</Button>
-      </div> */}
     </dialog>
   );
 };

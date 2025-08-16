@@ -2,14 +2,14 @@
 
 import useClickOutside from "@/hooks/useClickOutside";
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { IconType } from "react-icons";
 import { HiDotsVertical } from "react-icons/hi";
 
 // メニュー項目の型を定義
 interface MenuItem {
   label: string;
-  onClick?: () => void;
+  onClick?: (e: React.MouseEvent) => void;
   href?: string;
   disabled?: boolean;
   isDestructive?: boolean; // 削除など、危険なアクションを示すプロパティ
@@ -73,8 +73,8 @@ const DropdownMenu = ({ items }: DropdownMenuProps) => {
               return (
                 <button
                   key={index}
-                  onClick={() => {
-                    item.onClick?.();
+                  onClick={(e) => {
+                    item.onClick?.(e);
                     setIsOpen(false);
                   }}
                   disabled={item.disabled}

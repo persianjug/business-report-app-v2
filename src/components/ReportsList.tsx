@@ -17,7 +17,6 @@ const ReportsList = ({ reports }: ReportListProps) => {
     <div className="container mx-auto p-4 max-w-6xl">
       <PageHeader
         title={`業務報告書一覧`}
-        description={undefined}
         actions={<CreateReportLinkButton />}
         isSticky
       />

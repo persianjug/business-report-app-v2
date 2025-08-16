@@ -29,9 +29,9 @@ export const setReport = async (report: Report): Promise<void> => {
   }
 }
 
-export const updateReport = async (report: Report): Promise<void> => {
+export const updateReport = async (reportId: string | number, report: Report): Promise<void> => {
   try {
-    await api.put("/reports", report);
+    await api.put(`/reports/${reportId}`, report);
   } catch (error) {
     console.error("報告書の更新に失敗しました:", error);
   }

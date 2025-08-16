@@ -3,7 +3,7 @@ import { IconType } from "react-icons";
 
 interface ButtonProps {
   children: ReactNode;
-  onClick: () => void;
+  onClick?: () => void;
   variant?: "primary" | "secondary" | "success" | "danger" | "edit" | "outline";
   type?: "button" | "submit" | "reset";
   disabled?: boolean;
