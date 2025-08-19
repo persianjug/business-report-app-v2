@@ -36,6 +36,7 @@ export default function CreateForm() {
     performLoadLatest,
     performBackToList,
     performRemoveTask,
+    handleSaveAsDraft,
   } = useReportForm(REPORT_INITIAL_DATA);
 
   // ドロップダウンリストのメニュー
@@ -80,6 +81,7 @@ export default function CreateForm() {
               handleAddTask={handleAddTask}
               handleRemoveTask={handleRemoveTask}
               handleLoadLatest={handleLoadLatest}
+              handleSaveAsDraft={handleSaveAsDraft}
               hasReports={hasReports}
             />
           </>

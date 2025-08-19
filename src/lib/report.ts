@@ -23,7 +23,7 @@ export const getReports = async (): Promise<Report[] | null> => {
 
 export const setReport = async (report: Report): Promise<void> => {
   try {
-    await api.post("/reports", report);
+    await api.post("/reports", { ...report, status: "published" });
   } catch (error) {
     console.error("報告書の作成に失敗しました:", error);
   }
@@ -31,7 +31,7 @@ export const setReport = async (report: Report): Promise<void> => {
 
 export const updateReport = async (reportId: string | number, report: Report): Promise<void> => {
   try {
-    await api.put(`/reports/${reportId}`, report);
+    await api.put(`/reports/${reportId}`, { ...report, status: "published" });
   } catch (error) {
     console.error("報告書の更新に失敗しました:", error);
   }
@@ -63,3 +63,36 @@ export const fetchExcelFile = async (reportId: string | number): Promise<void> =
     console.error("Excelファイルのダウンロードに失敗しました:", error);
   }
 }
+
+// 下書き登録用
+export const setDraftReport = async (report: Report): Promise<void> => {
+  try {
+    await api.post("/reports", { ...report, status: "draft" });
+  } catch (error) {
+    console.error("下書きの登録に失敗しました:", error);
+    throw error;
+  }
+};
+
+// 下書き更新用
+export const updateDraftReport = async (reportId: string | number, report: Report): Promise<void> => {
+  try {
+    await api.put(`/reports/${report.id}`, { ...report, status: "draft" });
+  } catch (error) {
+    console.error("下書きの登録に失敗しました:", error);
+    throw error;
+  }
+};
+
+
+
+// 下書き一覧取得APIの新規関数
+export const getDraftReports = async (): Promise<Report[]> => {
+  try {
+    const response = await api.get<Report[]>("/reports/drafts");
+    return response.data;
+  } catch (error) {
+    console.error("下書きの取得に失敗しました:", error);
+    throw error;
+  }
+};

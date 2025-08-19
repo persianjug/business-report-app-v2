@@ -6,7 +6,7 @@ const ReportsListPage = async () => {
    const reports: Report[] | null = await getReports();
 
    return (
-      <ReportsList reports={reports}/>
+      <ReportsList reports={reports}  title="業務報告書一覧" />
    )
 }
 

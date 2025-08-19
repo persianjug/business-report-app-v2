@@ -42,6 +42,7 @@ const EditForm = ({ reportId, initialData }: EditFormProps) => {
     closeModal,
     closeBanner,
     performRemoveTask,
+    handleSaveAsDraft,
   } = useReportForm(initialData);
 
   // const { handleBackToDetail } = useReportEditActions(reportId);
@@ -87,6 +88,7 @@ const EditForm = ({ reportId, initialData }: EditFormProps) => {
           handleAddTask={handleAddTask}
           handleRemoveTask={handleRemoveTask}
           handleLoadLatest={handleLoadLatest}
+          handleSaveAsDraft={handleSaveAsDraft}
           hasReports={hasReports}
           isEditMode={true}
         // onBackToDetail={handleBackToDetail}

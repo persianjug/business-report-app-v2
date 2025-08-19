@@ -6,7 +6,7 @@ import { useFieldArray, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { reportSchema, FormData } from "@/schemas/reportSchema";
 import api from "@/utils/axios";
-import { setReport, updateReport } from "@/lib/report";
+import { setDraftReport, setReport, updateReport } from "@/lib/report";
 import { ModalBannerState, modalState } from "@/types/modal";
 import { INITIAL_MODAL_BANNER_STATE, INITIAL_MODAL_STATE, LOAD_LATEST_DIRTY_MODAL_STATE, LOAD_LATEST_ERROR_MODAL_STATE, LOAD_LATEST_SUCCESS_MODAL_STATE } from "@/Constants/modalConstants";
 
@@ -202,6 +202,31 @@ export const useReportForm = (initialData: FormData | null = null) => {
     }
   };
 
+  // 下書き保存処理のハンドラー
+  const handleSaveAsDraft = async () => {
+    try {
+      await setDraftReport(formData);
+      setUiState(prev => ({
+        ...prev,
+        modal: { isOpen: false, type: null, message: "", title: "" },
+        banner: { isVisible: true, message: "下書きを保存しました。", type: "success" },
+      }));
+      // 下書き保存後、編集画面に留まる
+      // IDがなければ、新規作成として扱うためにリセット
+      // if (!formData.id) {
+      //   reset({ ...formData, id: 'new-id-or-something' }); // 実際に保存されたIDを受け取るロジックが必要
+      // }
+    } catch (error) {
+      setUiState(prev => ({
+        ...prev,
+        modal: { isOpen: false, type: null, message: "", title: "" },
+        banner: { isVisible: true, message: "下書きの保存に失敗しました。", type: "error" },
+      }));
+    }
+  };
+
+
+
   // 一覧へ戻る操作処理
   const performBackToList = () => {
     router.push("/reports");
@@ -336,5 +361,6 @@ export const useReportForm = (initialData: FormData | null = null) => {
     performBackToList,
     performBackToDetail,
     performRemoveTask,
+    handleSaveAsDraft,
   };
 };

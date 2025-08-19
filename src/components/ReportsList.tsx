@@ -6,9 +6,10 @@ import ReportCard from "./ReportCard";
 
 interface ReportListProps {
   reports: Report[] | null;
+  title: string;
 }
 
-const ReportsList = ({ reports }: ReportListProps) => {
+const ReportsList = ({ reports, title }: ReportListProps) => {
   if (!reports) {
     notFound();
   }
@@ -16,7 +17,7 @@ const ReportsList = ({ reports }: ReportListProps) => {
   return (
     <div className="container mx-auto p-4 max-w-6xl">
       <PageHeader
-        title={`業務報告書一覧`}
+        title={title}
         actions={<CreateReportLinkButton />}
         isSticky
       />

@@ -20,6 +20,7 @@ interface InputFormProps {
   hasReports: boolean;
   isEditMode?: boolean;
   onBackToDetail?: () => void;
+  handleSaveAsDraft: () => void;
 };
 
 const InputForm = ({
@@ -31,6 +32,7 @@ const InputForm = ({
   handleRemoveTask,
   isEditMode = false,
   onBackToDetail,
+  handleSaveAsDraft,
 }: InputFormProps) => {
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
@@ -69,7 +71,8 @@ const InputForm = ({
       <ConsultationSection register={register} />
 
       {/* 確認画面へ進む */}
-      <div className="flex justify-end mt-6">
+      <div className="flex justify-end mt-6 gap-x-4">
+        <Button type="button" variant="secondary" onClick={handleSaveAsDraft}>下書き保存</Button>
         <Button type="submit" variant="primary">確認画面へ進む</Button>
       </div>
     </form>
