@@ -55,3 +55,5 @@ export const REPORT_INITIAL_DATA: Report = {
   createdAt: "",
   updateAt: ""
 }
+
+export type Tab = "published" | "drafts" | "all";

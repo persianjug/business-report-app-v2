@@ -2,6 +2,7 @@ import { Report } from "@/types/Report";
 import Link from "next/link";
 import { FaChevronRight } from "react-icons/fa";
 import { MdPlayArrow } from "react-icons/md";
+import StatusBadge from "./StatusBadge";
 
 interface ReportCardProps {
   report: Report;
@@ -20,7 +21,6 @@ const ReportCard = ({ report }: ReportCardProps) => {
     return [formattedDate, weekday];
   };
 
-  // 更新日を時分秒までフォーマットする新しい関数
   const formatUpdatedAt = (dateString: string | undefined) => {
     if (!dateString) return "---";
     const date = new Date(dateString);
@@ -35,9 +35,6 @@ const ReportCard = ({ report }: ReportCardProps) => {
     });
   };
 
-
-
-
   const [startDateFormatted, startWeekday] = formatDateWithWeekday(report.startDate);
   const [endDateFormatted, endWeekday] = formatDateWithWeekday(report.endDate);
   const createdAtFormatted = formatUpdatedAt(report.createdAt);
@@ -45,56 +42,74 @@ const ReportCard = ({ report }: ReportCardProps) => {
 
   return (
     <Link href={`/reports/${report.id}`} className="block relative p-6 bg-white rounded-lg shadow-sm border border-gray-200 hover:bg-gray-50 transition-colors cursor-pointer">
-      {/* 行全体をリンクにするための設定 */}
       <div className="absolute inset-0 z-10" aria-label={`${report.id} の詳細へ`}></div>
 
-      {/* <div className="flex justify-between items-start mb-4"> */}
-      <div className="flex justify-between items-center mb-4">
-        <div className="flex-1">
-          <p className="text-gray-500 font-medium mb-1">
+      <div className="flex flex-row items-center gap-x-12">
+        {/* ステータスバッチ */}
+        <div><StatusBadge status={report.status} /></div>
+
+        {/* 明細 */}
+        <div>
+          {/* ID */}
+          <p className="text-gray-500 font-medium text-lg mb-4">
             <span className="text-sm">#</span>
-            <span className="text-lg">{String(report.id).padStart(3, "0")}</span>
+            <span>{String(report.id).padStart(3, "0")}</span>
           </p>
-          <div className="flex items-center space-x-4 text-xl md:text-2xl text-blue-900">
+
+          {/* <div className="flex justify-between items-start mb-4">
+            <div className="flex items-start space-x-4">
+              <div className="flex flex-col">
+                <p className="text-gray-500 font-medium text-lg">
+                  <span className="text-sm">#</span>
+                  <span>{String(report.id).padStart(3, "0")}</span>
+                </p>
+              </div>
+            </div>
+          </div> */}
+
+          {/* 報告対象期間 */}
+          <div className="flex items-center space-x-4 text-2xl md:text-3xl text-blue-900 font-extrabold mb-4">
             <div className="flex items-end">
-              <span className="font-extrabold">{startDateFormatted}</span>
+              <span>{startDateFormatted}</span>
               <span className="text-base font-extralight">{`(${startWeekday})`}</span>
             </div>
             <div className="flex items-end">
-              <MdPlayArrow className="w-6 h-6 mt-1" />
+              <MdPlayArrow className="w-8 h-8" />
             </div>
             <div className="flex items-end">
-              <span className="font-extrabold">{endDateFormatted}</span>
+              <span>{endDateFormatted}</span>
               <span className="text-base font-extralight">{`(${endWeekday})`}</span>
             </div>
           </div>
+
+          {/* 詳細情報 */}
+          <div className="grid gap-x-4 gap-y-1 text-sm text-gray-600">
+            <div className="flex">
+              <p className="font-semibold w-28">エンド企業名:</p>
+              <p>{report.customerInfo?.endClient}</p>
+            </div>
+            <div className="flex">
+              <p className="font-semibold w-28">上位顧客名:</p>
+              <p>{report.customerInfo?.upperClient}</p>
+            </div>
+            <div className="flex">
+              <p className="font-semibold w-28">案件名:</p>
+              <p>{report.projectInfo?.projectName}</p>
+            </div>
+            <div className="flex">
+              <p className="font-semibold w-28">更新日:</p>
+              <p>{updatedAtFormatted === "---" ? createdAtFormatted : updatedAtFormatted}</p>
+            </div>
+          </div>
+
+          {/* 矢印アイコン */}
+          <div className="absolute top-1/2 right-4 transform -translate-y-1/2">
+            <FaChevronRight className="w-12 h-12 text-gray-400 z-20" />
+          </div>
         </div>
-        {/* <div className="text-right"> */}
-        <div className="flex flex-col items-end justify-center">
-          {/* <p className="text-xs text-gray-400"> */}
-          <p className="text-xs text-gray-400 mb-1">
-            {/* {report.updateAt ? report.updateAt : "---"} */}
-            {updatedAtFormatted === "---" ? createdAtFormatted : updatedAtFormatted}
-          </p>
-          <FaChevronRight className="w-6 h-6 text-gray-400 mt-2 z-20" />
-        </div>
+
       </div>
 
-      {/* <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm text-gray-600"> */}
-      <div className="grid gap-x-4 gap-y-1 text-sm text-gray-600">
-        <div className="flex">
-          <p className="font-semibold w-28">エンド企業名:</p>
-          <p>{report.customerInfo.endClient}</p>
-        </div>
-        <div className="flex">
-          <p className="font-semibold w-28">上位顧客名:</p>
-          <p>{report.customerInfo.upperClient}</p>
-        </div>
-        <div className="flex">
-          <p className="font-semibold w-28">案件名:</p>
-          <p>{report.projectInfo.projectName}</p>
-        </div>
-      </div>
     </Link>
   );
 };

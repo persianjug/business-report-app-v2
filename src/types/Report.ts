@@ -11,6 +11,7 @@ export interface Report {
   consultation: string;
   createdAt: string;
   updateAt: string;
+  status: string;
 }
 
 export interface CustomerInfo {

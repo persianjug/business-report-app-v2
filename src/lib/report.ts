@@ -92,7 +92,17 @@ export const getDraftReports = async (): Promise<Report[]> => {
     const response = await api.get<Report[]>("/reports/drafts");
     return response.data;
   } catch (error) {
-    console.error("下書きの取得に失敗しました:", error);
+    console.error("下書き報告書の取得に失敗しました:", error);
+    throw error;
+  }
+};
+
+export const getPublishedReports = async (): Promise<Report[]> => {
+  try {
+    const response = await api.get<Report[]>("/reports/published");
+    return response.data;
+  } catch (error) {
+    console.error("登録済み報告書の取得に失敗しました:", error);
     throw error;
   }
 };
