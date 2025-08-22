@@ -23,8 +23,8 @@ const TaskTable = ({ tasks }: TaskTableProps) => {
           {tasks.map((task, index) => (
             <tr key={index}>
               <td className="px-4 py-2 border border-gray-300">{task.taskName || "未入力"}</td>
-              <td className="px-4 py-2 whitespace-pre-wrap border border-gray-300">{task.status || "未入力"}</td>
-              <td className="px-4 py-2 whitespace-pre-wrap border border-gray-300">{task.problem || "未入力"}</td>
+              <td className="px-4 py-2 whitespace-pre-wrap border border-gray-300">{task.taskProgress || "未入力"}</td>
+              <td className="px-4 py-2 whitespace-pre-wrap border border-gray-300">{task.taskProblem || "未入力"}</td>
             </tr>
           ))}
         </tbody>

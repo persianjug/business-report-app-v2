@@ -35,8 +35,8 @@ export interface ProjectInfo {
 
 export interface Task {
   taskName: string;
-  status: string;
-  problem: string;
+  taskProgress: string;
+  taskProblem: string;
 }
 
 export interface OtherInfo {
