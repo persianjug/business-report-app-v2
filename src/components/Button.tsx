@@ -8,6 +8,7 @@ interface ButtonProps {
   type?: "button" | "submit" | "reset";
   disabled?: boolean;
   icon?: IconType;
+  form?: string;
 }
 
 const Button = ({
@@ -17,6 +18,7 @@ const Button = ({
   type = "button",
   disabled = false,
   icon: Icon,
+  form,
 }: ButtonProps) => {
   const baseClasses = "flex items-center justify-center font-medium py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors duration-200";
 
@@ -37,6 +39,7 @@ const Button = ({
       onClick={onClick}
       className={`${baseClasses} ${variantClasses[variant]} ${disabledClasses}`}
       disabled={disabled}
+      form={form}
     >
       {Icon && <Icon className="mr-2 h-5 w-5" />}
       <span>{children}</span>

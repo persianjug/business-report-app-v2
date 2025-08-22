@@ -2,7 +2,7 @@ import { ReactNode } from "react";
 
 interface PageHeaderProps {
   title: string;
-  description?: ReactNode;
+  description?: string;
   actions?: ReactNode;
   isSticky?: boolean;
 }
@@ -19,8 +19,8 @@ const PageHeader = ({ title, description, actions, isSticky = false }: PageHeade
         )}
       </div>
       {description && (
-        <div className="bg-blue-100 p-4 rounded-md mb-6" role="alert">
-          {description}
+        <div className="bg-gray-100 p-4 rounded-md mb-6">
+          <p className="text-gray-700">{description}</p>
         </div>
       )}
     </>

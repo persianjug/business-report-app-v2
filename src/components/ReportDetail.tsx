@@ -55,8 +55,9 @@ const ReportDetail = ({ reportId, report }: ReportDetailProps) => {
         isSticky
       />
 
-      {/* <div className="space-y-6"> */}
-      <ConfirmationView formData={report} isConfirm={false} />
+      <div className="space-y-6 text-sm">
+        <ConfirmationView formData={report} isConfirm={false} />
+      </div>
 
       {/* モーダル */}
       <ConfirmationModal
