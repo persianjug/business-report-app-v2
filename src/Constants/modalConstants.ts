@@ -41,3 +41,4 @@ export const INITIAL_MODAL_BANNER_STATE: ModalBannerState = {
     type: null
   },
 }
+

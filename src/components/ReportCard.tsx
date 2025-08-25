@@ -41,7 +41,8 @@ const ReportCard = ({ report }: ReportCardProps) => {
   const updatedAtFormatted = formatUpdatedAt(report.updateAt);
 
   return (
-    <Link href={`/reports/${report.id}`} className="block relative p-6 bg-white rounded-lg shadow-sm border border-gray-200 hover:bg-gray-50 transition-colors cursor-pointer">
+    <Link href={`/reports/${report.id}${report.status === "draft" ? "/draft" : ""}`}
+      className="block relative p-6 bg-white rounded-lg shadow-sm border border-gray-200 hover:bg-gray-50 transition-colors cursor-pointer">
       <div className="absolute inset-0 z-10" aria-label={`${report.id} の詳細へ`}></div>
 
       <div className="flex flex-row items-center gap-x-12">

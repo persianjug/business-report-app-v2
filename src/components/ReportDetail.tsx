@@ -11,6 +11,10 @@ import Button from "./Button";
 import Link from "next/link";
 import ConfirmationModal from "./ConfirmationModal";
 import PageHeader from "./PageHeader";
+import { reportFormatNewLines } from "@/utils/reportHelper";
+import { useScrollLock } from "@/hooks/useScrollLock";
+import NotificationBanner from "./NotificationBanner";
+import LoadingSpinner from "./LoadingSpinner";
 
 interface ReportDetailProps {
   reportId: string | number;
@@ -18,7 +22,14 @@ interface ReportDetailProps {
 }
 
 const ReportDetail = ({ reportId, report }: ReportDetailProps) => {
-  const { handleDelete, handleExcelExport, isModalOpen, setIsModalOpen } = useReportDetailActions(reportId);
+  const {
+    handleExcelExport,
+    handleRemoveReport,
+    modalState,
+    bannerState,
+    isLoading,
+  } = useReportDetailActions(reportId);
+  useScrollLock([modalState.isOpen, bannerState.isVisible]);
 
   const dropDownMenuItems = [
     {
@@ -30,7 +41,7 @@ const ReportDetail = ({ reportId, report }: ReportDetailProps) => {
     },
     {
       label: "報告書を削除",
-      onClick: () => setIsModalOpen(true),
+      onClick: () => handleRemoveReport(reportId),
       disabled: false,
       isDestructive: true,
       icon: FaRegTrashAlt,
@@ -41,9 +52,79 @@ const ReportDetail = ({ reportId, report }: ReportDetailProps) => {
     notFound();
   }
 
+  // return (
+  //   <div className="container mx-auto p-4 max-w-4xl">
+  //     {/* ローディングスピナーとモーダルは同時に表示しないようにする */}
+  //     {isLoading ? (
+  //       <div className="flex justify-center items-center h-screen">
+  //         <LoadingSpinner />
+  //       </div>
+  //     ) : (
+  //       <>
+  //         {/* ヘッダー */}
+  //         <PageHeader
+  //           title={`業務報告書の詳細（ID: ${report.id}）`}
+  //           actions={
+  //             <>
+  //               <Link href="/reports" className="text-blue-600 hover:underline px-4 py-2">
+  //                 一覧に戻る
+  //               </Link>
+  //               <Button variant="secondary" onClick={handleExcelExport} icon={FaFileExcel}>
+  //                 Excel出力
+  //               </Button>
+  //               <DropdownMenu items={dropDownMenuItems} />
+  //             </>
+  //           }
+  //           isSticky
+  //         />
+
+  //         {/* 明細 */}
+  //         <div className="space-y-6 text-sm">
+  //           <ConfirmationView formData={reportFormatNewLines(report)} isConfirm={false} />
+  //         </div>
+
+  //         {/* モーダル */}
+  //         {modalState.isOpen && (
+  //           <ConfirmationModal
+  //             isOpen={modalState.isOpen}
+  //             variant={modalState.variant}
+  //             title={modalState.title}
+  //             message={modalState.message}
+  //             confirmButtonText={modalState.confirmButtonText}
+  //             cancelButtonText={modalState.cancelButtonText}
+  //             onClose={modalState.onClose}
+  //             onConfirm={modalState.onConfirm}
+  //           />
+  //         )}
+
+  //         {/* ノーティフィケーションバナー */}
+  //         {bannerState.isVisible && (
+  //           <NotificationBanner
+  //             message={bannerState.message}
+  //             type={bannerState.type!}
+  //             onClose={bannerState.onClose}
+  //           />
+  //         )}
+  //       </>
+  //     )}
+  //   </div>
+  // );
+
+
+
+  // ローディング中はローディングスピナーだけを表示
+  if (isLoading) {
+    return (
+      <div className="container mx-auto p-4 max-w-4xl flex justify-center items-center h-screen">
+        <LoadingSpinner />
+      </div>
+    );
+  }
+
   return (
     <div className="container mx-auto p-4 max-w-4xl">
-      <PageHeader
+      {/* ヘッダー */}
+      < PageHeader
         title={`業務報告書の詳細（ID: ${report.id}）`}
         actions={
           <>
@@ -55,20 +136,33 @@ const ReportDetail = ({ reportId, report }: ReportDetailProps) => {
         isSticky
       />
 
+      {/* 明細 */}
       <div className="space-y-6 text-sm">
-        <ConfirmationView formData={report} isConfirm={false} />
+        <ConfirmationView formData={reportFormatNewLines(report)} isConfirm={false} />
       </div>
 
       {/* モーダル */}
-      <ConfirmationModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onConfirm={handleDelete}
-        variant="error"
-        confirmButtonText="報告書を削除する"
-        title="報告書の削除"
-        message="本当にこの報告書を削除しますか？この操作は元に戻せません。"
-      />
+      {modalState.isOpen && (
+        <ConfirmationModal
+          isOpen={modalState.isOpen}
+          variant={modalState.variant}
+          title={modalState.title}
+          message={modalState.message}
+          confirmButtonText={modalState.confirmButtonText}
+          cancelButtonText={modalState.cancelButtonText}
+          onClose={modalState.onClose}
+          onConfirm={modalState.onConfirm}
+        />
+      )}
+
+      {/* ノーティフィケーションバナー */}
+      {bannerState.isVisible && (
+        <NotificationBanner
+          message={bannerState.message}
+          type={bannerState.type!}
+          onClose={bannerState.onClose}
+        />
+      )}
     </div>
   );
 }

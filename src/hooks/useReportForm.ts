@@ -7,8 +7,9 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { reportSchema, FormData } from "@/schemas/reportSchema";
 import api from "@/utils/axios";
 import { setDraftReport, setReport, updateReport } from "@/lib/report";
-import { ModalBannerState, modalState } from "@/types/modal";
-import { INITIAL_MODAL_BANNER_STATE, INITIAL_MODAL_STATE, LOAD_LATEST_DIRTY_MODAL_STATE, LOAD_LATEST_ERROR_MODAL_STATE, LOAD_LATEST_SUCCESS_MODAL_STATE } from "@/Constants/modalConstants";
+import { ModalBannerState } from "@/types/modal";
+import { INITIAL_MODAL_BANNER_STATE } from "@/Constants/modalConstants";
+import { reportFormatNewLines } from "@/utils/reportHelper";
 
 export const useReportForm = (initialData: FormData | null = null) => {
   const router = useRouter();
@@ -30,7 +31,7 @@ export const useReportForm = (initialData: FormData | null = null) => {
     formState: { errors, isDirty },
   } = useForm<FormData>({
     resolver: yupResolver(reportSchema),
-    defaultValues: initialData,
+    defaultValues: reportFormatNewLines(initialData),
   });
 
   const { fields, append, remove } = useFieldArray({
@@ -82,12 +83,6 @@ export const useReportForm = (initialData: FormData | null = null) => {
     }
   };
 
-  // const handleRemoveTask = (index: number) => {
-  //   if (window.confirm("本当にこのタスクを削除しますか？")) {
-  //     remove(index);
-  //   }
-  // };
-
   // 既存のhandleRemoveTaskをモーダル表示に置き換える
   const handleRemoveTask = (index: number) => {
     setTaskToRemoveIndex(index);
@@ -101,7 +96,7 @@ export const useReportForm = (initialData: FormData | null = null) => {
       banner: { isVisible: false, message: "", type: null },
     });
     // モーダル表示時にスクロールを無効化
-    document.body.style.overflow = "hidden";
+    // document.body.style.overflow = "hidden";
   };
 
   // モーダルで削除が確定されたときに実行する関数
@@ -110,6 +105,46 @@ export const useReportForm = (initialData: FormData | null = null) => {
       remove(taskToRemoveIndex);
       setTaskToRemoveIndex(null); // 削除後インデックスをリセット
       closeModal(); // モーダルを閉じる
+    }
+  };
+
+  const handleRemoveReport = async (reportId: string | number | null) => {
+    setUiState({
+      modal: {
+        isOpen: true,
+        type: "removeReport",
+        title: `下書きデータの削除（ID:${reportId}）`,
+        message: "本当にこの下書きデータを削除しますか？元にに戻せません。",
+      },
+      banner: { isVisible: false, message: "", type: null },
+    });
+    // モーダル表示時にスクロールを無効化
+    // document.body.style.overflow = "hidden";
+  };
+
+  const performRemoveReport = async (reportId: string | number | null) => {
+    try {
+      // await deleteReport(reportId);
+      console.info("報告書が正常に削除されました");
+      // バナーで成功メッセージを表示(prevは最新状態のスナップショット)
+      setUiState(prev => ({
+        ...prev,
+        modal: { isOpen: false, type: null, message: "", title: "" },
+        banner: { isVisible: true, message: `下書きデータ（ID:${reportId}）が削除されました。`, type: "success" },
+      }));
+
+      // 2秒後に一覧ページへ遷移
+      setTimeout(() => {
+        router.push("/reports");
+      }, 2000); // 2000ms = 2秒
+    } catch (error) {
+      console.error("報告書の削除に失敗しました。:", error);
+      setUiState(prev => ({
+        ...prev,
+        modal: { isOpen: false, type: null, message: "", title: "" },
+        banner: { isVisible: true, message: `下書きデータ（ID:${reportId}）の削除が失敗しました。`, type: "error" },
+      }));
+
     }
   };
 
@@ -175,13 +210,14 @@ export const useReportForm = (initialData: FormData | null = null) => {
     try {
       const response = await api.get<any>("/reports/latest");
       const latestReport = response.data;
+      const formatedReport = reportFormatNewLines(latestReport);
       reset({
-        ...latestReport,
+        ...formatedReport,
         startDate: "",
         endDate: "",
         overallProgress: "",
-        tasks: latestReport.tasks?.length > 0
-          ? latestReport.tasks.map((task: any) => ({ ...task, status: "", problem: "" }))
+        tasks: formatedReport.tasks?.length > 0
+          ? formatedReport.tasks.map((task: any) => ({ ...task, status: "", problem: "" }))
           : [{ taskName: "", status: "", problem: "" }],
       });
 
@@ -225,8 +261,6 @@ export const useReportForm = (initialData: FormData | null = null) => {
     }
   };
 
-
-
   // 一覧へ戻る操作処理
   const performBackToList = () => {
     router.push("/reports");
@@ -245,7 +279,7 @@ export const useReportForm = (initialData: FormData | null = null) => {
       modal: { ...prev.modal, isOpen: false }
     }))
     // ここでスクロールを元に戻す(スクロールができるようにする)
-    document.body.style.overflow = "";
+    // document.body.style.overflow = "";
   };
 
   // バナーを閉じる関数
@@ -255,7 +289,7 @@ export const useReportForm = (initialData: FormData | null = null) => {
       banner: { isVisible: false, message: "", type: null },
     }));
     // ここでスクロールを元に戻す(スクロールができるようにする)
-    document.body.style.overflow = "";
+    // document.body.style.overflow = "";
   };
 
   // ドロップダウンメニューの「最新の報告書を読み込む」ボタンのハンドラー
@@ -362,5 +396,7 @@ export const useReportForm = (initialData: FormData | null = null) => {
     performBackToDetail,
     performRemoveTask,
     handleSaveAsDraft,
+    handleRemoveReport,
+    performRemoveReport,
   };
 };

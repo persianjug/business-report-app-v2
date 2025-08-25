@@ -1,5 +1,6 @@
 import { ReactNode, useRef, useEffect } from "react";
 import Button from "./Button";
+import LoadingSpinner from "./LoadingSpinner";
 
 interface ConfirmationModalProps {
   isOpen: boolean;
@@ -10,7 +11,7 @@ interface ConfirmationModalProps {
   children?: ReactNode;
   confirmButtonText?: string;
   cancelButtonText?: string;
-  variant?: "confirm" | "success" | "error";
+  variant?: "confirm" | "success" | "error" | "loading";
 }
 
 const ConfirmationModal = ({
@@ -31,10 +32,8 @@ const ConfirmationModal = ({
     const body = document.body;
     if (isOpen) {
       dialogRef.current?.showModal();
-      body.style.overflow = "hidden"; // モーダルが開いたらスクロールを無効化
     } else {
       dialogRef.current?.close();
-      body.style.overflow = ""; // モーダルが閉じたらスクロールを元に戻す
     }
   }, [isOpen]);
 
@@ -43,6 +42,22 @@ const ConfirmationModal = ({
     if (variant === "success") return "success";
     return "primary";
   };
+
+  // variantが'loading'の場合、コンテンツを置き換える
+  if (variant === "loading") {
+    return (
+      <dialog
+        ref={dialogRef}
+        className="backdrop:bg-gray-500/90 rounded-lg shadow-xl p-0 w-full max-w-lg fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
+      >
+        <div className="flex flex-col items-center justify-center p-8">
+          <LoadingSpinner />
+          <h3 className="mt-4 text-lg font-medium text-gray-900">{title}</h3>
+          <p className="mt-2 text-sm text-gray-500">{message}</p>
+        </div>
+      </dialog>
+    );
+  }
 
   return (
     <dialog
@@ -59,7 +74,6 @@ const ConfirmationModal = ({
         {children}
       </div>
 
-      {/* <div className="px-6 py-4 mt-6 sm:flex sm:flex-row-reverse gap-x-6"> */}
       <div className="px-6 py-4 mt-6 sm:flex sm:flex-row gap-x-4 justify-end">
         <Button
           variant="outline"

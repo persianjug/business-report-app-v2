@@ -33,7 +33,7 @@ const Textarea = ({
         id={id}
         rows={rows}
         {...register}
-        className={inputClass}
+        className={`${inputClass} whitespace-pre-wrap`}
       ></textarea>
       <ErrorMessage message={errorMessage} />
     </div>

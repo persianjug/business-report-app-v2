@@ -5,21 +5,22 @@ import Button from "./Button";
 import ConfirmationView from "./ConfirmationView";
 import InputForm from "./InputForm";
 import { notFound } from "next/navigation";
-import DropdownMenu from "./DropdownMenu";
 import Link from "next/link";
 import PageHeader from "./PageHeader";
 import { Report } from "@/types/Report";
 import ConfirmationModal from "./ConfirmationModal";
 import NotificationBanner from "./NotificationBanner";
 import ScrollButtons from "./ScrollButtons";
+import { FaRegTrashAlt } from "react-icons/fa";
+import { useReportDetailActions } from "@/hooks/useReportDetailAction";
 import { useScrollLock } from "@/hooks/useScrollLock";
 
-interface EditFormProps {
+interface DraftEditFormProps {
   reportId: string | number;
   initialData: Report;
 }
 
-const EditForm = ({ reportId, initialData }: EditFormProps) => {
+const DraftEditForm = ({ reportId, initialData }: DraftEditFormProps) => {
   const {
     step,
     setStep,
@@ -35,29 +36,19 @@ const EditForm = ({ reportId, initialData }: EditFormProps) => {
     onSubmitToConfirm,
     handleApiPutSubmit,
     handleLoadLatest,
-    handleBackToListFromEdit,
-    handleBackToDetail,
-    performBackToList,
-    performBackToDetail,
     modalState,
     bannerState,
     closeModal,
     closeBanner,
     performRemoveTask,
     handleSaveAsDraft,
+    handleRemoveReport,
+    performRemoveReport,
   } = useReportForm(initialData);
 
   useScrollLock([modalState.isOpen, bannerState.isVisible]);
 
   const formId = "edit-report-form";
-
-  const dropDownMenuItems = [
-    {
-      label: "一覧へ戻る",
-      onClick: handleBackToListFromEdit,
-      disabled: false,
-    },
-  ];
 
   if (!initialData) {
     notFound();
@@ -68,18 +59,18 @@ const EditForm = ({ reportId, initialData }: EditFormProps) => {
       {/* ヘッダー */}
       {step === "input" && (
         <PageHeader
-          title={`業務報告書の修正（ID: ${reportId}）`}
+          title={`下書きの修正（ID: ${reportId}）`}
           description={
             <>
               <p className="text-gray-700">
-                業務報告書を編集します。必要事項を修正し、「確認画面へ進む」ボタンを押してください
+                下書きを編集します。必要事項を修正し、「確認画面へ進む」ボタンを押してください
               </p>
             </>
           }
           actions={
             <>
-              <Link href={`/reports/${reportId}`} className="text-blue-600 hover:underline px-4 py-2" onClick={handleBackToDetail}>詳細に戻る</Link>
-              <DropdownMenu items={dropDownMenuItems} />
+              <Link href={`/reports`} className="text-blue-600 hover:underline px-4 py-2">一覧に戻る</Link>
+              <Button variant="outline" onClick={() => handleRemoveReport(reportId)} icon={FaRegTrashAlt}>下書きを削除</Button>
             </>
           }
           isSticky
@@ -147,15 +138,11 @@ const EditForm = ({ reportId, initialData }: EditFormProps) => {
         <ConfirmationModal
           isOpen={modalState.isOpen}
           onClose={closeModal}
-          onConfirm={modalState.type === "removeTask" ? performRemoveTask : (
-            modalState.type === "backToList" ? performBackToList : () => performBackToDetail(reportId)
-          )}
+          onConfirm={modalState.type === "removeTask" ? performRemoveTask : () => performRemoveReport(reportId)}
           title={modalState.title}
           message={modalState.message}
           variant={"confirm"}
-          confirmButtonText={modalState.type === "removeTask" ? "タスクを削除する" : (
-            modalState.type === "backToList" ? "破棄して一覧へ戻る" : "破棄して詳細へ戻る"
-          )}
+          confirmButtonText={modalState.type === "removeTask" ? "タスクを削除する" : "下書きデータを削除する"}
           cancelButtonText="キャンセル"
         />
       )}
@@ -168,12 +155,8 @@ const EditForm = ({ reportId, initialData }: EditFormProps) => {
           onClose={closeBanner}
         />
       )}
-
-
-
-
     </div>
   );
 }
 
-export default EditForm;
+export default DraftEditForm;

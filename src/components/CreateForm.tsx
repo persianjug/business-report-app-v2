@@ -11,6 +11,7 @@ import Link from "next/link";
 import PageHeader from "./PageHeader";
 import ConfirmationModal from "./ConfirmationModal";
 import NotificationBanner from "./NotificationBanner";
+import ScrollButtons from "./ScrollButtons";
 
 export default function CreateForm() {
   const {
@@ -130,6 +131,9 @@ export default function CreateForm() {
           </div>
         </div>
       )}
+
+      {/* ページ上部、下部へスクロールボタン */}
+      <ScrollButtons />
 
       {/* モーダルコンポーネント */}
       {modalState.isOpen && (

@@ -106,3 +106,7 @@ export const getPublishedReports = async (): Promise<Report[]> => {
     throw error;
   }
 };
+
+export const deleteReportTest = async (reportId: string | number): Promise<void> => {
+    console.info("報告書の削除に成功しました");
+}
