@@ -46,6 +46,11 @@ export interface OtherInfo {
   vacationPlans: string;
 }
 
+export interface PaginatedReports {
+  reports: Report[];
+  totalCount: number;
+}
+
 // Enumの定義を追加
 export type Position = "PG" | "SE" | "SE(社員代替)" | "テスター" | "オペレーター" | "PL" | "PM" | "社員代替";
 export type WorkStyle = "併用勤務(在宅率6割以上)" | "併用勤務(在宅率6割未満)" | "現場勤務" | "在宅勤務";

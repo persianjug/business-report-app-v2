@@ -25,7 +25,7 @@ const ReportsTabs = ({ activeTab }: ReportsTabsProps) => {
   const activeTabIndex = ["all", "published", "drafts"].indexOf(activeTab);
 
   return (
-    <div className="w-4/10 mb-8">
+    <div className="md:w-4/10 mb-8">
       <div className="flex justify-center mb-1">
         <Link href={`${pathname}?tab=all`} className={tabClass("all")} prefetch={false}>
           すべて

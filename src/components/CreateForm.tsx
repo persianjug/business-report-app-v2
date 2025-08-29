@@ -111,7 +111,7 @@ export default function CreateForm() {
             />
           </form>
           <div className="flex justify-end mt-6 gap-x-4">
-            <Button type="button" variant="secondary" onClick={handleSaveAsDraft} form={formId}>下書き保存</Button>
+            <Button type="button" variant="outline" onClick={handleSaveAsDraft} form={formId}>下書き保存</Button>
             <Button type="submit" variant="primary" form={formId}>確認画面へ進む</Button>
           </div>
         </div>

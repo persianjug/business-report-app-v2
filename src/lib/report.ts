@@ -110,3 +110,39 @@ export const getPublishedReports = async (): Promise<Report[]> => {
 export const deleteReportTest = async (reportId: string | number): Promise<void> => {
     console.info("報告書の削除に成功しました");
 }
+
+
+interface PaginatedReports {
+  reports: Report[];
+  totalCount: number;
+}
+
+export const getReportsPaginated = async ({ limit, offset }: { limit: number; offset: number }): Promise<PaginatedReports> => {
+  try {
+    const response = await api.get<PaginatedReports>(`/reports?limit=${limit}&offset=${offset}`);
+    return response.data;
+  } catch (error) {
+    console.error("報告書の取得に失敗しました:", error);
+    throw error;
+  }
+};
+
+export const getDraftReportsPaginated = async ({ limit, offset }: { limit: number; offset: number }): Promise<PaginatedReports> => {
+  try {
+    const response = await api.get<PaginatedReports>(`/reports/drafts?limit=${limit}&offset=${offset}`);
+    return response.data;
+  } catch (error) {
+    console.error("下書き報告書の取得に失敗しました:", error);
+    throw error;
+  }
+};
+
+export const getPublishedReportsPaginated = async ({ limit, offset }: { limit: number; offset: number }): Promise<PaginatedReports> => {
+  try {
+    const response = await api.get<PaginatedReports>(`/reports/published?limit=${limit}&offset=${offset}`);
+    return response.data;
+  } catch (error) {
+    console.error("登録済み報告書の取得に失敗しました:", error);
+    throw error;
+  }
+};

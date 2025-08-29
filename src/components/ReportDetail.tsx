@@ -5,7 +5,7 @@ import { notFound } from "next/navigation";
 import ConfirmationView from "@/components/ConfirmationView";
 import DropdownMenu from "./DropdownMenu";
 import { useReportDetailActions } from "@/hooks/useReportDetailAction";
-import { FaFileExcel, FaRegTrashAlt } from "react-icons/fa";
+import { FaFileExcel, FaRegFileExcel, FaRegTrashAlt } from "react-icons/fa";
 import { RiPencilLine } from "react-icons/ri";
 import Button from "./Button";
 import Link from "next/link";
@@ -124,12 +124,13 @@ const ReportDetail = ({ reportId, report }: ReportDetailProps) => {
   return (
     <div className="container mx-auto p-4 max-w-4xl">
       {/* ヘッダー */}
-      < PageHeader
+      <PageHeader
         title={`業務報告書の詳細（ID: ${report.id}）`}
         actions={
           <>
             <Link href="/reports" className="text-blue-600 hover:underline px-4 py-2">一覧に戻る</Link>
-            <Button variant="secondary" onClick={handleExcelExport} icon={FaFileExcel}>Excel出力</Button>
+            {/* <Button variant="outline" onClick={handleExcelExport} icon={FaFileExcel}>Excel出力</Button> */}
+            <Button variant="outline" onClick={handleExcelExport} icon={FaRegFileExcel}>Excel出力</Button>
             <DropdownMenu items={dropDownMenuItems} />
           </>
         }
