@@ -10,9 +10,11 @@ import Link from "next/link";
 import PageHeader from "./PageHeader";
 import { Report } from "@/types/Report";
 import ConfirmationModal from "./ConfirmationModal";
-import NotificationBanner from "./NotificationBanner";
 import ScrollButtons from "./ScrollButtons";
 import { useScrollLock } from "@/hooks/useScrollLock";
+import ErrorAlert from "./ErrorAlert";
+import PageDescription from "./PageDescription";
+import { transformReportToFormData } from "@/utils/reportHelper";
 
 interface EditFormProps {
   reportId: string | number;
@@ -23,38 +25,34 @@ const EditForm = ({ reportId, initialData }: EditFormProps) => {
   const {
     step,
     setStep,
-    hasReports,
     register,
-    handleSubmit,
-    control,
     errors,
     fields,
     formData,
+    handleSubmit,
     handleAddTask,
     handleRemoveTask,
-    onSubmitToConfirm,
-    handleApiPutSubmit,
-    handleLoadLatest,
-    handleBackToListFromEdit,
-    handleBackToDetail,
-    performBackToList,
-    performBackToDetail,
-    modalState,
-    bannerState,
-    closeModal,
-    closeBanner,
-    performRemoveTask,
+    handleApiPut,
     handleSaveAsDraft,
-  } = useReportForm(initialData);
+    handleBackToList,
+    handleBackToDetail,
+    modalState,
+    showErrorAlert,
+    isDirty,
+  } = useReportForm(transformReportToFormData(initialData));
 
-  useScrollLock([modalState.isOpen, bannerState.isVisible]);
+  // モーダル表示時のスクロール禁止制御
+  useScrollLock([modalState.isOpen]);
 
+  // フォームID
+  // InputFormコンポーネントでフォーム外で送信処理を行うため指定が必要
   const formId = "edit-report-form";
 
+  // ドロップダウンリストのメニュー
   const dropDownMenuItems = [
     {
       label: "一覧へ戻る",
-      onClick: handleBackToListFromEdit,
+      onClick: handleBackToList,
       disabled: false,
     },
   ];
@@ -65,34 +63,46 @@ const EditForm = ({ reportId, initialData }: EditFormProps) => {
 
   return (
     <div className="container mx-auto p-4 max-w-4xl">
-      {/* ヘッダー */}
+      {/* ヘッダー：編集画面 */}
       {step === "input" && (
         <PageHeader
           title={`業務報告書の修正（ID: ${reportId}）`}
           description={
             <>
-              <p className="text-gray-700">
-                業務報告書を編集します。必要事項を修正し、「確認画面へ進む」ボタンを押してください
-              </p>
+              {showErrorAlert ?
+                <ErrorAlert
+                  message="入力内容に不備があります。"
+                  subMessage="すべての項目が正しく入力されているか確認してください。"
+                />
+                :
+                <PageDescription>
+                  業務報告書を編集します。必要事項を入力し、「確認画面へ進む」ボタンを押してください。
+                </PageDescription>
+              }
             </>
           }
           actions={
             <>
-              <Link href={`/reports/${reportId}`} className="text-blue-600 hover:underline px-4 py-2" onClick={handleBackToDetail}>詳細に戻る</Link>
+              <Link
+                href={`/reports/${reportId}`}
+                className="text-blue-600 hover:underline px-4 py-2"
+                onClick={e => handleBackToDetail(e, reportId)}>詳細に戻る</Link>
               <DropdownMenu items={dropDownMenuItems} />
             </>
           }
           isSticky
         />
       )}
+
+      {/* ヘッダー：確認画面 */}
       {step === "confirm" && (
         <PageHeader
           title={"修正内容の確認"}
           description={
-            <div className="text-blue-700">
+            <PageDescription>
               <p className="font-bold">内容をご確認ください。</p>
               <p>以下の内容でよろしければ、「この内容で更新する」ボタンを押してください。</p>
-            </div>
+            </PageDescription>
           }
           actions={
             <>
@@ -103,28 +113,26 @@ const EditForm = ({ reportId, initialData }: EditFormProps) => {
         />
       )}
 
+      {/* メインコンテンツ：編集画面 */}
       {step === "input" && (
         <>
-          <form onSubmit={handleSubmit(onSubmitToConfirm)} id={formId} className="space-y-6 text-sm">
+          <form onSubmit={handleSubmit} id={formId} className="space-y-6 text-sm">
             <InputForm
               register={register}
-              control={control}
               errors={errors}
               fields={fields}
               handleAddTask={handleAddTask}
               handleRemoveTask={handleRemoveTask}
-              handleLoadLatest={handleLoadLatest}
-              handleSaveAsDraft={handleSaveAsDraft}
-              hasReports={hasReports}
-              isEditMode={true}
             />
           </form>
           <div className="flex justify-end mt-6 gap-x-4">
             <Button type="button" variant="outline" onClick={handleSaveAsDraft} form={formId}>下書き保存</Button>
-            <Button type="submit" variant="primary" form={formId}>確認画面へ進む</Button>
+            <Button type="submit" variant="primary" form={formId} disabled={!isDirty}>確認画面へ進む</Button>
           </div>
         </>
       )}
+
+      {/* メインコンテンツ：確認画面 */}
       {step === "confirm" && (
         <div className="space-y-6">
           <div className="text-sm">
@@ -134,7 +142,7 @@ const EditForm = ({ reportId, initialData }: EditFormProps) => {
             <Button
               type="button"
               variant="success"
-              onClick={() => handleApiPutSubmit(reportId)}>この内容で更新する</Button>
+              onClick={() => handleApiPut(reportId)}>この内容で更新する</Button>
           </div>
         </div>
       )}
@@ -142,36 +150,19 @@ const EditForm = ({ reportId, initialData }: EditFormProps) => {
       {/* ページ上部、下部へスクロールボタン */}
       <ScrollButtons />
 
-      {/* モーダルコンポーネント */}
+      {/* モーダル */}
       {modalState.isOpen && (
         <ConfirmationModal
           isOpen={modalState.isOpen}
-          onClose={closeModal}
-          onConfirm={modalState.type === "removeTask" ? performRemoveTask : (
-            modalState.type === "backToList" ? performBackToList : () => performBackToDetail(reportId)
-          )}
+          variant={modalState.variant}
           title={modalState.title}
           message={modalState.message}
-          variant={"confirm"}
-          confirmButtonText={modalState.type === "removeTask" ? "タスクを削除する" : (
-            modalState.type === "backToList" ? "破棄して一覧へ戻る" : "破棄して詳細へ戻る"
-          )}
-          cancelButtonText="キャンセル"
+          confirmButtonText={modalState.confirmButtonText}
+          cancelButtonText={modalState.cancelButtonText}
+          onClose={modalState.onClose}
+          onConfirm={modalState.onConfirm}
         />
       )}
-
-      {/* ノーティフィケーションバナーコンポーネント */}
-      {bannerState.isVisible && (
-        <NotificationBanner
-          message={bannerState.message}
-          type={bannerState.type!}
-          onClose={closeBanner}
-        />
-      )}
-
-
-
-
     </div>
   );
 }

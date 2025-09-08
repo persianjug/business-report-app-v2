@@ -2,26 +2,37 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useFieldArray, useForm } from "react-hook-form";
+import { SubmitHandler, useFieldArray, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { reportSchema, FormData } from "@/schemas/reportSchema";
 import api from "@/utils/axios";
-import { setDraftReport, setReport, updateReport } from "@/lib/report";
-import { ModalBannerState } from "@/types/modal";
-import { INITIAL_MODAL_BANNER_STATE } from "@/Constants/modalConstants";
-import { reportFormatNewLines } from "@/utils/reportHelper";
+import { getLatestReport, setDraftReport, setReport, updateReport } from "@/lib/report";
+import { transformFormDataToReport, transformReportToFormData } from "@/utils/reportHelper";
+import { useModal } from "./useModal";
+import { toast } from "react-toastify";
+import { MAX_TASKS } from "@/Constants/reportConstants";
+import { useToastsAndNavigation } from "./useToastsAndNavigation";
+import { useReportDeletion } from "./useReportDeletion";
+import { createDiscardModalState, createLoadLatestModalState, createTaskDeletionModalState } from "@/utils/modelHelper";
 
-export const useReportForm = (initialData: FormData | null = null) => {
+export const useReportForm = (initialData: FormData) => {
   const router = useRouter();
+  // 最新データ有無の状態
   const [hasReports, setHasReports] = useState(false);
+  // フォーム画面と確認画面の切り替え状態
   const [step, setStep] = useState<"input" | "confirm">("input");
-
-  // モーダルとバナー表示状態とタイプを管理
-  const [uiState, setUiState] = useState<ModalBannerState>(INITIAL_MODAL_BANNER_STATE);
-
-  // タスク削除用モーダルの状態
+  // モーダルの表示状態
+  const { modalState, showModal, closeModal } = useModal();
+  // タスク削除対象の状態
   const [taskToRemoveIndex, setTaskToRemoveIndex] = useState<number | null>(null);
+  // フォームエラー時にアラートを表示する状態
+  const [showErrorAlert, setShowErrorAlert] = useState(false);
+  // 成功、エラー時の通知
+  const { handleSuccess, handleError } = useToastsAndNavigation();
+  // データ削除のハンドラー
+  const { handleRemoveReport, performRemoveReport } = useReportDeletion({ modalState, showModal, closeModal });
 
+  // フォームのバディデーション機能初期化
   const {
     register,
     handleSubmit,
@@ -31,27 +42,30 @@ export const useReportForm = (initialData: FormData | null = null) => {
     formState: { errors, isDirty },
   } = useForm<FormData>({
     resolver: yupResolver(reportSchema),
-    defaultValues: reportFormatNewLines(initialData),
+    defaultValues: initialData,
   });
 
+  // フォームのバディデーション機能初期化（タスク） 
   const { fields, append, remove } = useFieldArray({
     control,
     name: "tasks",
   });
 
+  // フォーム入力状態を監視
   const formData = watch();
 
+  // 先頭フォーム画面と確認画面で切り替えときに先頭にスクロール
   useEffect(() => {
     if (step === "confirm" || step === "input") {
-      // 画面の先頭（x座標: 0, y座標: 0）にスムーズにスクロール
       window.scrollTo({
         top: 0,
         left: 0,
         behavior: "smooth",
       });
     }
-  }, [step]); // stepの状態が変わるたびにこのエフェクトが実行される
+  }, [step]);
 
+  // 報告書データの存在確認（初回レンダリング時）
   useEffect(() => {
     const checkReports = async () => {
       try {
@@ -64,6 +78,7 @@ export const useReportForm = (initialData: FormData | null = null) => {
     checkReports();
   }, []);
 
+  // ブラウザバック時のフォーム未保存の検知
   useEffect(() => {
     const handleBeforeUnload = (event: BeforeUnloadEvent) => {
       if (isDirty) {
@@ -77,326 +92,205 @@ export const useReportForm = (initialData: FormData | null = null) => {
     };
   }, [isDirty]);
 
-  const handleAddTask = () => {
-    if (fields.length < 5) {
-      append({ taskName: "", status: "", problem: "" });
-    }
-  };
-
-  // 既存のhandleRemoveTaskをモーダル表示に置き換える
-  const handleRemoveTask = (index: number) => {
-    setTaskToRemoveIndex(index);
-    setUiState({
-      modal: {
-        isOpen: true,
-        type: "removeTask",
-        title: "タスクの削除",
-        message: "本当にこのタスクを削除しますか？",
-      },
-      banner: { isVisible: false, message: "", type: null },
-    });
-    // モーダル表示時にスクロールを無効化
-    // document.body.style.overflow = "hidden";
-  };
-
-  // モーダルで削除が確定されたときに実行する関数
-  const performRemoveTask = () => {
-    if (taskToRemoveIndex !== null) {
-      remove(taskToRemoveIndex);
-      setTaskToRemoveIndex(null); // 削除後インデックスをリセット
-      closeModal(); // モーダルを閉じる
-    }
-  };
-
-  const handleRemoveReport = async (reportId: string | number | null) => {
-    setUiState({
-      modal: {
-        isOpen: true,
-        type: "removeReport",
-        title: `下書きデータの削除（ID:${reportId}）`,
-        message: "本当にこの下書きデータを削除しますか？元にに戻せません。",
-      },
-      banner: { isVisible: false, message: "", type: null },
-    });
-    // モーダル表示時にスクロールを無効化
-    // document.body.style.overflow = "hidden";
-  };
-
-  const performRemoveReport = async (reportId: string | number | null) => {
-    try {
-      // await deleteReport(reportId);
-      console.info("報告書が正常に削除されました");
-      // バナーで成功メッセージを表示(prevは最新状態のスナップショット)
-      setUiState(prev => ({
-        ...prev,
-        modal: { isOpen: false, type: null, message: "", title: "" },
-        banner: { isVisible: true, message: `下書きデータ（ID:${reportId}）が削除されました。`, type: "success" },
-      }));
-
-      // 2秒後に一覧ページへ遷移
-      setTimeout(() => {
-        router.push("/reports");
-      }, 2000); // 2000ms = 2秒
-    } catch (error) {
-      console.error("報告書の削除に失敗しました。:", error);
-      setUiState(prev => ({
-        ...prev,
-        modal: { isOpen: false, type: null, message: "", title: "" },
-        banner: { isVisible: true, message: `下書きデータ（ID:${reportId}）の削除が失敗しました。`, type: "error" },
-      }));
-
-    }
-  };
-
-  const onSubmitToConfirm = async (data: FormData) => {
-    setStep("confirm");
-  };
-
-  const handleApiPostSubmit = async () => {
-    try {
-      await setReport(formData);
-      // alert("報告書が正常に作成されました");
-      // バナーで成功メッセージを表示(prevは最新状態のスナップショット)
-      setUiState(prev => ({
-        ...prev,
-        modal: { isOpen: false, type: null, message: "", title: "" },
-        banner: { isVisible: true, message: "報告書を登録しました。", type: "success" },
-      }));
-
-      // 2秒後に一覧ページへ遷移
-      setTimeout(() => {
-        router.push("/reports");
-      }, 2000); // 2000ms = 2秒
-
-    } catch (error) {
-      // alert("報告書の作成に失敗しました");
-      // バナーで失敗メッセージを表示(prevは最新状態のスナップショット)
-      setUiState(prev => ({
-        ...prev,
-        modal: { isOpen: false, type: null, message: "", title: "" },
-        banner: { isVisible: true, message: "報告書の登録に失敗しました。", type: "error" },
-      }));
-      // router.push("/reports");
-    }
-  };
-
-  const handleApiPutSubmit = async (reportId: string | number) => {
-    try {
-      await updateReport(reportId, formData);
-      // alert("報告書が正常に更新されました");
-      setUiState(prev => ({
-        ...prev,
-        modal: { isOpen: false, type: null, message: "", title: "" },
-        banner: { isVisible: true, message: "報告書を更新しました。", type: "success" },
-      }));
-
-      // 2秒後に一覧ページへ遷移
-      setTimeout(() => {
-        router.push("/reports");
-      }, 2000); // 2000ms = 2秒
-
-    } catch (error) {
-      // alert("報告書の更新に失敗しました");
-      setUiState(prev => ({
-        ...prev,
-        modal: { isOpen: false, type: null, message: "", title: "" },
-        banner: { isVisible: true, message: "報告書の更新に失敗しました。", type: "error" },
-      }));
-    }
-  };
-
-  // 最新の報告書ロード処理
-  const performLoadLatest = async () => {
-    try {
-      const response = await api.get<any>("/reports/latest");
-      const latestReport = response.data;
-      const formatedReport = reportFormatNewLines(latestReport);
-      reset({
-        ...formatedReport,
-        startDate: "",
-        endDate: "",
-        overallProgress: "",
-        tasks: formatedReport.tasks?.length > 0
-          ? formatedReport.tasks.map((task: any) => ({ ...task, status: "", problem: "" }))
-          : [{ taskName: "", status: "", problem: "" }],
-      });
-
-      // バナーで成功メッセージを表示(prevは最新状態のスナップショット)
-      setUiState(prev => ({
-        ...prev,
-        modal: { isOpen: false, type: null, message: "", title: "" },
-        banner: { isVisible: true, message: "最新の報告書データを読み込みました。", type: "success" },
-      }));
-    } catch (error) {
-      console.error("最新の報告書データの取得に失敗しました:", error);
-      // バナーで失敗メッセージを表示(prevは最新状態のスナップショット)
-      setUiState(prev => ({
-        ...prev,
-        modal: { isOpen: false, type: null, message: "", title: "" },
-        banner: { isVisible: true, message: "最新の報告書データが見つかりませんでした。", type: "error" },
-      }));
-    }
-  };
-
-  // 下書き保存処理のハンドラー
-  const handleSaveAsDraft = async () => {
-    try {
-      await setDraftReport(formData);
-      setUiState(prev => ({
-        ...prev,
-        modal: { isOpen: false, type: null, message: "", title: "" },
-        banner: { isVisible: true, message: "下書きを保存しました。", type: "success" },
-      }));
-      // 下書き保存後、編集画面に留まる
-      // IDがなければ、新規作成として扱うためにリセット
-      // if (!formData.id) {
-      //   reset({ ...formData, id: 'new-id-or-something' }); // 実際に保存されたIDを受け取るロジックが必要
-      // }
-    } catch (error) {
-      setUiState(prev => ({
-        ...prev,
-        modal: { isOpen: false, type: null, message: "", title: "" },
-        banner: { isVisible: true, message: "下書きの保存に失敗しました。", type: "error" },
-      }));
-    }
-  };
-
   // 一覧へ戻る操作処理
   const performBackToList = () => {
     router.push("/reports");
   };
 
   // 詳細へ戻る操作処理
-  const performBackToDetail = (reportId: string | number) => {
+  const performBackToDetail = (reportId: string | number | null) => {
     router.push(`/reports/${reportId}`);
   };
 
-
-  // モーダルを閉じる関数
-  const closeModal = () => {
-    setUiState(prev => ({
-      ...prev,
-      modal: { ...prev.modal, isOpen: false }
-    }))
-    // ここでスクロールを元に戻す(スクロールができるようにする)
-    // document.body.style.overflow = "";
+  // タスク削除処理
+  const performRemoveTask = () => {
+    try {
+      if (taskToRemoveIndex !== null) {
+        remove(taskToRemoveIndex);
+        console.info("タスクが正常に削除されました。");
+        toast.success(`タスク${taskToRemoveIndex} が削除されました。`);
+        setTaskToRemoveIndex(null);
+        closeModal();
+      }
+    } catch (error) {
+      console.error("タスクの削除が失敗しました。");
+      toast.error(`タスク${taskToRemoveIndex} の削除が失敗しました。`);
+    } finally {
+      closeModal();
+    }
   };
 
-  // バナーを閉じる関数
-  const closeBanner = () => {
-    setUiState(prev => ({
-      ...prev,
-      banner: { isVisible: false, message: "", type: null },
-    }));
-    // ここでスクロールを元に戻す(スクロールができるようにする)
-    // document.body.style.overflow = "";
+  // 報告書の登録処理
+  const performRegisterReport = async () => {
+    const reportData = transformFormDataToReport(formData);
+    await setReport(reportData);
   };
 
-  // ドロップダウンメニューの「最新の報告書を読み込む」ボタンのハンドラー
+  // 報告書の更新処理
+  const performUpdateReport = async (reportId: string | number) => {
+    const reportData = transformFormDataToReport(formData);
+    await updateReport(reportId, reportData);
+  };
+
+  // 下書き報告書の登録処理
+  const performResisterDraftReport = async () => {
+    const reportData = transformFormDataToReport(formData);
+    await setDraftReport(reportData);
+  };
+
+  // 最新の報告書取得処理
+  const fetchLatestReportData = async (): Promise<FormData | null> => {
+    const response = await getLatestReport();
+    const latestReport = transformReportToFormData(response);
+    return latestReport;
+  }
+
+  // フォームの内容をリセット
+  const performResetFormWithData = (data: FormData | null) => {
+    reset(data);
+  };
+
+  // 最新の報告書ロード処理
+  const performLoadLatest = async () => {
+    try {
+      const loadedData = await fetchLatestReportData();
+      performResetFormWithData(loadedData);
+      handleSuccess("最新の報告書データを読み込みました。");
+    } catch (error) {
+      handleError(error as Error, "最新の報告書データが見つかりませんでした。");
+    } finally {
+      closeModal();
+    }
+  };
+
+  // 「最新の報告書を読み込む」ボタン押下時のハンドラー
   const handleLoadLatest = () => {
     if (isDirty) {
-      // フォームに変更がある場合は確認モーダルを表示
-      setUiState({
-        modal: {
-          isOpen: true,
-          type: "confirm",
-          title: "最新報告書の読み込み",
-          message: "現在入力中の内容は保存されません。最新の報告書を読み込みますか？",
-        },
-        banner: { isVisible: false, message: "", type: null },
-      });
+      showModal(createLoadLatestModalState(performLoadLatest, closeModal));
     } else {
-      // 変更がない場合は直接読み込みを実行
       performLoadLatest();
     }
   };
 
-  // 「一覧へ戻る」ボタンのハンドラー
+  // 「タスク追加」ボタン押下時のハンドラー
+  const handleAddTask = () => {
+    if (fields.length < MAX_TASKS) {
+      append({ taskName: "", taskProgress: "", taskProblem: "" });
+    }
+  };
+
+  // 「タスク削除」リンク押下時のハンドラー
+  const handleRemoveTask = (index: number) => {
+    setTaskToRemoveIndex(index);
+    showModal(createTaskDeletionModalState(index, performRemoveTask, closeModal));
+  };
+
+  // 「確認画面へ進む」ボタン押下時のハンドラー
+  const handleSubmitToConfirm: SubmitHandler<FormData> = (formData: FormData) => {
+    setShowErrorAlert(false); // 成功した場合はエラーアラートを非表示
+    setStep("confirm");
+  };
+
+  // バリデーション失敗時のハンドラー
+  const onValidationFailure = () => {
+    setShowErrorAlert(true); // 失敗した場合はエラーアラートを表示
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth"
+    });
+  };
+
+  // フォームのonSubmitに渡す関数
+  const onSubmitHandler = handleSubmit(handleSubmitToConfirm, onValidationFailure);
+
+  // 「この内容で登録する」ボタン押下時のハンドラー
+  const handleApiPost = async () => {
+    try {
+      await performRegisterReport();
+      handleSuccess("報告書を登録しました。", "/reports");
+    } catch (error) {
+      handleError(error as Error, "報告書の登録に失敗しました。");
+    }
+  };
+
+  // 「この内容で更新する」ボタン押下時のハンドラー
+  const handleApiPut = async (reportId: string | number, status: "published" | "draft") => {
+    const successMessage = status === "published" ?
+      `報告書（ID:${reportId}）を更新しました。`
+      :
+      `下書きデータ（ID:${reportId}）を報告書として登録しました。`;
+
+    const errorMessage = status === "published" ?
+      `報告書（ID:${reportId}）の更新に失敗しました。`
+      :
+      `下書きデータ（ID:${reportId}）から報告書への登録に失敗しました。`;
+
+    try {
+      await performUpdateReport(reportId);
+      handleSuccess(successMessage, "/reports");
+    } catch (error) {
+      handleError(error as Error, errorMessage);
+    }
+  };
+
+  // 下書き保存処理のハンドラー
+  const handleSaveAsDraft = async () => {
+    try {
+      await performResisterDraftReport();
+      handleSuccess("下書きの報告書を登録しました。", "/reports");
+    } catch (error) {
+      handleError(error as Error, "下書きの報告書の登録に失敗しました。");
+    }
+  };
+
+  // 「一覧へ戻る」ボタン押下時のハンドラー
   const handleBackToList = (e: React.MouseEvent) => {
     if (isDirty) {
-      // isDirtyがtrueの場合、デフォルトのイベントをキャンセルしてモーダルを表示
       e.preventDefault();
-      setUiState({
-        modal: {
-          isOpen: true,
-          type: "backToList",
-          title: "入力内容の破棄",
-          message: "入力中の内容が破棄されますがよろしいですか？",
-        },
-        banner: { isVisible: false, message: "", type: null },
-      });
+      showModal(createDiscardModalState(performBackToList, closeModal));
     } else {
       // フォームの変更なしの場合Linkのデフォルト動作で遷移。
     }
   };
-  // 「一覧へ戻る」ボタンのハンドラー
-  const handleBackToListFromEdit = (e: React.MouseEvent) => {
-    if (isDirty) {
-      // isDirtyがtrueの場合、デフォルトのイベントをキャンセルしてモーダルを表示
-      e.preventDefault();
-      setUiState({
-        modal: {
-          isOpen: true,
-          type: "backToList",
-          title: "入力内容の破棄",
-          message: "入力中の内容が破棄されますがよろしいですか？",
-        },
-        banner: { isVisible: false, message: "", type: null },
-      });
-    } else {
-      // フォームの変更なしの場合
-      performBackToList();
-    }
-  };
 
-  // 「詳細へ戻る」ボタンのハンドラー
-  const handleBackToDetail = (e: React.MouseEvent) => {
+  // 「詳細へ戻る」ボタン押下時のハンドラー
+  const handleBackToDetail = (e: React.MouseEvent, reportId: string | number | null) => {
     if (isDirty) {
-      // isDirtyがtrueの場合、デフォルトのイベントをキャンセルしてモーダルを表示
       e.preventDefault();
-      setUiState({
-        modal: {
-          isOpen: true,
-          type: "backToDetail",
-          title: "入力内容の破棄",
-          message: "入力中の内容が破棄されますがよろしいですか？",
-        },
-        banner: { isVisible: false, message: "", type: null },
-      });
+      showModal(createDiscardModalState(() => performBackToDetail(reportId), closeModal));
     } else {
-      // isDirtyがfalseの場合は何もしない（Linkのデフォルト動作で遷移）
+      performBackToDetail(reportId);
     }
   };
 
   return {
     step,
-    setStep,
+    isDirty,
     hasReports,
-    register,
-    handleSubmit,
     control,
     errors,
     fields,
     formData,
+    modalState,
+    showErrorAlert,
+    setStep,
+    register,
+    handleSubmit: onSubmitHandler,
     handleAddTask,
     handleRemoveTask,
-    onSubmitToConfirm,
-    handleApiPostSubmit,
-    handleApiPutSubmit,
+    handleSubmitToConfirm,
+    handleApiPost,
+    handleApiPut,
     handleLoadLatest,
     handleBackToList,
-    handleBackToListFromEdit,
     handleBackToDetail,
-    modalState: uiState.modal,
-    bannerState: uiState.banner,
-    closeModal,
-    closeBanner,
+    handleSaveAsDraft,
+    handleRemoveReport,
     performLoadLatest,
     performBackToList,
     performBackToDetail,
     performRemoveTask,
-    handleSaveAsDraft,
-    handleRemoveReport,
     performRemoveReport,
+    closeModal,
   };
 };

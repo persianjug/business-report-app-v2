@@ -1,8 +1,7 @@
-import { Report } from "@/types/Report";
 import * as yup from "yup";
 
 // yupによるバリデーションスキーマ
-export const reportSchema = yup.object<Report>().shape({
+export const reportSchema = yup.object().shape({
   startDate: yup.string().required("報告対象期間の開始日は必須です。"),
   endDate: yup.string()
     .required("報告対象期間の終了日は必須です。")
@@ -40,10 +39,12 @@ export const reportSchema = yup.object<Report>().shape({
   tasks: yup.array().of(
     yup.object().shape({
       taskName: yup.string().required("タスク名は必須です。"),
-      status: yup.string().required("状況は必須です。"),
-      problem: yup.string().nullable(),
+      taskProgress: yup.string().required("状況は必須です。"),
+      taskProblem: yup.string().nullable(),
     })
-  ).min(1, "タスクは最低1つは必要です。"),
+  )
+  .min(1, "タスクは最低1つは必要です。")
+  .required("タスクは最低1つは必要です。"),
   futurePlans: yup.string().required("今後の予定は必須です。"),
   otherInfo: yup.object().shape({
     customerStatus: yup.string().nullable(),
@@ -51,7 +52,7 @@ export const reportSchema = yup.object<Report>().shape({
     healthStatus: yup.string().nullable(),
     vacationPlans: yup.string().nullable(),
   }),
-  consultation: yup.string().nullable(),
+  consultation: yup.string().nullable().optional(),
 });
 
 export type FormData = yup.InferType<typeof reportSchema>;

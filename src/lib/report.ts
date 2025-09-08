@@ -21,7 +21,7 @@ export const getReports = async (): Promise<Report[] | null> => {
   }
 }
 
-export const setReport = async (report: Report): Promise<void> => {
+export const setReport = async (report: Report | null): Promise<void> => {
   try {
     await api.post("/reports", { ...report, status: "published" });
   } catch (error) {
@@ -29,7 +29,7 @@ export const setReport = async (report: Report): Promise<void> => {
   }
 }
 
-export const updateReport = async (reportId: string | number, report: Report): Promise<void> => {
+export const updateReport = async (reportId: string | number, report: Report | null): Promise<void> => {
   try {
     await api.put(`/reports/${reportId}`, { ...report, status: "published" });
   } catch (error) {
@@ -65,7 +65,7 @@ export const fetchExcelFile = async (reportId: string | number): Promise<void> =
 }
 
 // 下書き登録用
-export const setDraftReport = async (report: Report): Promise<void> => {
+export const setDraftReport = async (report: Report | null): Promise<void> => {
   try {
     await api.post("/reports", { ...report, status: "draft" });
   } catch (error) {
@@ -146,3 +146,13 @@ export const getPublishedReportsPaginated = async ({ limit, offset }: { limit: n
     throw error;
   }
 };
+
+export const getLatestReport = async (): Promise<Report | null>  => {
+  try {
+    const res = await api.get<Report>("/reports/latest");
+    return res.data;
+  } catch (error) {
+    console.error("最新の報告書の取得に失敗しました:", error);
+    throw error;
+  }
+}

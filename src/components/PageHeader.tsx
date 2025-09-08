@@ -20,11 +20,7 @@ const PageHeader = ({ title, description, actions, isSticky = false }: PageHeade
           </div>
         )}
       </div>
-      {description && (
-        <div className="bg-blue-100 p-4 rounded-md mb-6" role="alert">
-          {description}
-        </div>
-      )}
+      {description}
     </>
   );
 };

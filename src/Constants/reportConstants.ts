@@ -1,5 +1,8 @@
 import { Report } from "@/types/Report"
 
+// タスクの数
+export const MAX_TASKS = 5;
+
 // 案件のポジション選択肢
 export const POSITIONS = [
   "PG",

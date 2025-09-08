@@ -1,4 +1,4 @@
-import { UseFormRegister, FieldErrors, UseFieldArrayReturn } from "react-hook-form";
+import { UseFormRegister, FieldErrors, UseFieldArrayReturn, Control } from "react-hook-form";
 import { FormData } from "@/schemas/reportSchema";
 import { BasicInfoSection } from "./BasicInfoSection";
 import { ConsultationSection } from "./ConsultationSection";

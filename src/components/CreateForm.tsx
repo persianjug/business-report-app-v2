@@ -10,61 +10,68 @@ import { BiLoaderAlt } from "react-icons/bi";
 import Link from "next/link";
 import PageHeader from "./PageHeader";
 import ConfirmationModal from "./ConfirmationModal";
-import NotificationBanner from "./NotificationBanner";
 import ScrollButtons from "./ScrollButtons";
+import { useScrollLock } from "@/hooks/useScrollLock";
+import PageDescription from "./PageDescription";
+import ErrorAlert from "./ErrorAlert";
+import { transformReportToFormData } from "@/utils/reportHelper";
 
-export default function CreateForm() {
+const CreateForm = () => {
   const {
     step,
     setStep,
-    hasReports,
     register,
     handleSubmit,
-    control,
     errors,
     fields,
     formData,
     handleAddTask,
     handleRemoveTask,
-    onSubmitToConfirm,
-    handleApiPostSubmit,
+    handleApiPost,
     handleLoadLatest,
     handleBackToList,
     modalState,
-    bannerState,
-    closeModal,
-    closeBanner,
-    performLoadLatest,
-    performBackToList,
-    performRemoveTask,
     handleSaveAsDraft,
-  } = useReportForm(REPORT_INITIAL_DATA);
+    showErrorAlert,
+    isDirty,
+  } = useReportForm(transformReportToFormData(REPORT_INITIAL_DATA));
 
-  const formId = "create-report-form";
+  // モーダル表示時のスクロール禁止制御
+  useScrollLock([modalState.isOpen]);
 
   // ドロップダウンリストのメニュー
   const dropDownMenuItems = [
     {
       label: "最新の報告書を読み込む",
       onClick: handleLoadLatest,
-      // disabled: hasReports,
       disabled: false,
       isDestructive: false,
       icon: BiLoaderAlt,
     },
   ];
 
+  // フォームID
+  // InputFormコンポーネントでフォーム外で送信処理を行うため指定が必要
+  const formId = "create-report-form";
+
   return (
     <div className="container mx-auto p-4 max-w-4xl">
-      {/* ヘッダー */}
+      {/* ヘッダー：新規作成画面 */}
       {step === "input" && (
         <PageHeader
           title={"業務報告書の登録内容入力"}
           description={
             <>
-              <p className="text-gray-700">
-                業務報告書を新規作成します。必要事項を入力し、「確認画面へ進む」ボタンを押してください。
-              </p>
+              {showErrorAlert ?
+                <ErrorAlert
+                  message="入力内容に不備があります。"
+                  subMessage="すべての項目が正しく入力されているか確認してください。"
+                />
+                :
+                <PageDescription>
+                  業務報告書を新規作成します。必要事項を入力し、「確認画面へ進む」ボタンを押してください。
+                </PageDescription>
+              }
             </>
           }
           actions={
@@ -76,14 +83,15 @@ export default function CreateForm() {
           isSticky
         />
       )}
+
       {step === "confirm" && (
         <PageHeader
           title={"登録内容の確認"}
           description={
-            <div className="text-blue-700">
+            <PageDescription>
               <p className="font-bold">内容をご確認ください。</p>
               <p>以下の内容でよろしければ、「この内容で登録する」ボタンを押してください。</p>
-            </div>
+            </PageDescription>
           }
           actions={
             <>
@@ -94,20 +102,16 @@ export default function CreateForm() {
         />
       )}
 
-      {/* フォーム */}
+      {/* メインコンテンツ：新規作成画面 */}
       {step === "input" && (
         <div className="space-y-6">
-          <form onSubmit={handleSubmit(onSubmitToConfirm)} id={formId} className="space-y-6 text-sm">
+          <form id={formId} onSubmit={handleSubmit} className="space-y-6 text-sm">
             <InputForm
               register={register}
-              control={control}
               errors={errors}
               fields={fields}
               handleAddTask={handleAddTask}
               handleRemoveTask={handleRemoveTask}
-              handleLoadLatest={handleLoadLatest}
-              handleSaveAsDraft={handleSaveAsDraft}
-              hasReports={hasReports}
             />
           </form>
           <div className="flex justify-end mt-6 gap-x-4">
@@ -117,7 +121,7 @@ export default function CreateForm() {
         </div>
       )}
 
-      {/* 確認 */}
+      {/* メインコンテンツ：確認画面 */}
       {step === "confirm" && (
         <div className="space-y-6">
           <div className="text-sm">
@@ -127,7 +131,7 @@ export default function CreateForm() {
             <Button
               type="button"
               variant="success"
-              onClick={handleApiPostSubmit}>この内容で登録する</Button>
+              onClick={handleApiPost}>この内容で登録する</Button>
           </div>
         </div>
       )}
@@ -135,32 +139,21 @@ export default function CreateForm() {
       {/* ページ上部、下部へスクロールボタン */}
       <ScrollButtons />
 
-      {/* モーダルコンポーネント */}
+      {/* モーダル */}
       {modalState.isOpen && (
         <ConfirmationModal
           isOpen={modalState.isOpen}
-          onClose={closeModal}
-          onConfirm={modalState.type === "removeTask" ? performRemoveTask : (
-            modalState.type === "backToList" ? performBackToList : performLoadLatest
-          )}
+          variant={modalState.variant}
           title={modalState.title}
           message={modalState.message}
-          variant={"confirm"}
-          confirmButtonText={modalState.type === "removeTask" ? "タスクを削除する" : (
-            modalState.type === "confirm" ? "最新報告書を読み込む" : "破棄して一覧へ戻る"
-          )}
-          cancelButtonText="キャンセル"
-        />
-      )}
-
-      {/* ノーティフィケーションバナーコンポーネント */}
-      {bannerState.isVisible && (
-        <NotificationBanner
-          message={bannerState.message}
-          type={bannerState.type!}
-          onClose={closeBanner}
+          confirmButtonText={modalState.confirmButtonText}
+          cancelButtonText={modalState.cancelButtonText}
+          onClose={modalState.onClose}
+          onConfirm={modalState.onConfirm}
         />
       )}
     </div>
   );
 }
+
+export default CreateForm;
