@@ -6,10 +6,9 @@ import { SubmitHandler, useFieldArray, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { reportSchema, FormData } from "@/schemas/reportSchema";
 import api from "@/utils/axios";
-import { getLatestReport, setDraftReport, setReport, updateReport } from "@/lib/report";
+import { getLatestReport, setDraftReport, setReport, updateDraftReport, updateReport, updateReportDraft, updateReportDraftToPublished } from "@/lib/report";
 import { transformFormDataToReport, transformReportToFormData } from "@/utils/reportHelper";
 import { useModal } from "./useModal";
-import { toast } from "react-toastify";
 import { MAX_TASKS } from "@/Constants/reportConstants";
 import { useToastsAndNavigation } from "./useToastsAndNavigation";
 import { useReportDeletion } from "./useReportDeletion";
@@ -107,42 +106,47 @@ export const useReportForm = (initialData: FormData) => {
     try {
       if (taskToRemoveIndex !== null) {
         remove(taskToRemoveIndex);
-        console.info("タスクが正常に削除されました。");
-        toast.success(`タスク${taskToRemoveIndex} が削除されました。`);
+        handleSuccess(`タスク${taskToRemoveIndex} が削除されました。`);
         setTaskToRemoveIndex(null);
-        closeModal();
+        // closeModal();
       }
     } catch (error) {
-      console.error("タスクの削除が失敗しました。");
-      toast.error(`タスク${taskToRemoveIndex} の削除が失敗しました。`);
+      handleError(error as Error, `タスク${taskToRemoveIndex} の削除が失敗しました。`);
     } finally {
-      closeModal();
+      // closeModal();
     }
   };
 
   // 報告書の登録処理
   const performRegisterReport = async () => {
-    const reportData = transformFormDataToReport(formData);
-    await setReport(reportData);
+    await setReport(transformFormDataToReport(formData));
   };
 
   // 報告書の更新処理
   const performUpdateReport = async (reportId: string | number) => {
-    const reportData = transformFormDataToReport(formData);
-    await updateReport(reportId, reportData);
+    await updateReport(reportId, transformFormDataToReport(formData));
+  };
+
+  // 下書きデータの更新処理
+  const performUpdateReportDraft = async (reportId: string | number) => {
+    await updateReportDraft(reportId, transformFormDataToReport(formData));
+  };
+
+  // 報告書の更新処理(下書きから公開済みへ)
+  const performUpdateReportDraftToPublished = async (reportId: string | number) => {
+    await updateReportDraftToPublished(reportId, transformFormDataToReport(formData));
   };
 
   // 下書き報告書の登録処理
   const performResisterDraftReport = async () => {
-    const reportData = transformFormDataToReport(formData);
-    await setDraftReport(reportData);
+    await setDraftReport(transformFormDataToReport(formData));
   };
 
   // 最新の報告書取得処理
   const fetchLatestReportData = async (): Promise<FormData | null> => {
     const response = await getLatestReport();
-    const latestReport = transformReportToFormData(response);
-    return latestReport;
+    // const latestReport = transformReportToFormData(response);
+    return transformReportToFormData(response);
   }
 
   // フォームの内容をリセット
@@ -218,12 +222,12 @@ export const useReportForm = (initialData: FormData) => {
     const successMessage = status === "published" ?
       `報告書（ID:${reportId}）を更新しました。`
       :
-      `下書きデータ（ID:${reportId}）を報告書として登録しました。`;
+      `下書きデータ（ID:${reportId}）を更新しました。`;
 
     const errorMessage = status === "published" ?
       `報告書（ID:${reportId}）の更新に失敗しました。`
       :
-      `下書きデータ（ID:${reportId}）から報告書への登録に失敗しました。`;
+      `下書きデータ（ID:${reportId}）の更新に失敗しました。`;
 
     try {
       await performUpdateReport(reportId);
@@ -232,6 +236,27 @@ export const useReportForm = (initialData: FormData) => {
       handleError(error as Error, errorMessage);
     }
   };
+
+  // 「下書き保存する」ボタン押下時のハンドラー（下書き編集画面用）
+  const handleApiPutDraft = async (reportId: string | number) => {
+    try {
+      await performUpdateReportDraft(reportId);
+      handleSuccess(`下書きデータ（ID:${reportId}）を更新しました。`, "/reports");
+    } catch (error) {
+      handleError(error as Error, `下書きデータ（ID:${reportId}）の更新に失敗しました。`);
+    }
+  };
+
+  // 「この内容で登録する」ボタン押下時のハンドラー(下書きデータを公開済みにする)
+  const handleApiPutDraftToPublished = async (reportId: string | number) => {
+    try {
+      await performUpdateReportDraftToPublished(reportId);
+      handleSuccess(`下書きデータ（ID:${reportId}）を報告書として登録しました。`, "/reports");
+    } catch (error) {
+      handleError(error as Error, `下書きデータ（ID:${reportId}）から報告書への登録に失敗しました。`);
+    }
+  };
+
 
   // 下書き保存処理のハンドラー
   const handleSaveAsDraft = async () => {
@@ -281,6 +306,8 @@ export const useReportForm = (initialData: FormData) => {
     handleSubmitToConfirm,
     handleApiPost,
     handleApiPut,
+    handleApiPutDraft,
+    handleApiPutDraftToPublished,
     handleLoadLatest,
     handleBackToList,
     handleBackToDetail,

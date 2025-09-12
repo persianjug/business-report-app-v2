@@ -35,6 +35,8 @@ const DraftEditForm = ({ reportId, initialData }: DraftEditFormProps) => {
     handleRemoveTask,
     handleRemoveReport,
     handleApiPut,
+    handleApiPutDraft,
+    handleApiPutDraftToPublished,
     handleBackToList,
     modalState,
     showErrorAlert,
@@ -117,7 +119,7 @@ const DraftEditForm = ({ reportId, initialData }: DraftEditFormProps) => {
             />
           </form>
           <div className="flex justify-end mt-6 gap-x-4">
-            <Button type="button" variant="outline" onClick={() => handleApiPut(reportId)} form={formId}>下書き保存</Button>
+            <Button type="button" variant="outline" onClick={() => handleApiPutDraft(reportId)} form={formId}>下書き保存</Button>
             <Button type="submit" variant="primary" form={formId}>確認画面へ進む</Button>
           </div>
         </>
@@ -133,7 +135,7 @@ const DraftEditForm = ({ reportId, initialData }: DraftEditFormProps) => {
             <Button
               type="button"
               variant="success"
-              onClick={() => handleApiPut(reportId)}>この内容で登録する</Button>
+              onClick={() => handleApiPutDraftToPublished(reportId)}>この内容で登録する</Button>
           </div>
         </div>
       )}

@@ -37,6 +37,15 @@ export const updateReport = async (reportId: string | number, report: Report | n
   }
 }
 
+export const updateReportDraft = async (reportId: string | number, report: Report | null): Promise<void> => {
+  try {
+    await api.put(`/reports/${reportId}`, { ...report, status: "draft" });
+  } catch (error) {
+    console.error("下書きデータの更新に失敗しました:", error);
+  }
+}
+
+
 export const deleteReport = async (reportId: string | number): Promise<void> => {
   try {
     await api.delete(`/reports/${reportId}`);
@@ -74,10 +83,10 @@ export const setDraftReport = async (report: Report | null): Promise<void> => {
   }
 };
 
-// 下書き更新用
-export const updateDraftReport = async (reportId: string | number, report: Report): Promise<void> => {
+// 下書き更新用(下書き→公開済)
+export const updateReportDraftToPublished = async (reportId: string | number, report: Report | null): Promise<void> => {
   try {
-    await api.put(`/reports/${report.id}`, { ...report, status: "draft" });
+    await api.put(`/reports/${reportId}`, { ...report, status: "published" });
   } catch (error) {
     console.error("下書きの登録に失敗しました:", error);
     throw error;
