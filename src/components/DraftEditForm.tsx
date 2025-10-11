@@ -14,12 +14,11 @@ import { FaRegTrashAlt } from "react-icons/fa";
 import { useScrollLock } from "@/hooks/useScrollLock";
 import ErrorAlert from "./ErrorAlert";
 import PageDescription from "./PageDescription";
-import { useReportDeletion } from "@/hooks/useReportDeletion";
 import { transformReportToFormData } from "@/utils/reportHelper";
 
 interface DraftEditFormProps {
   reportId: string | number;
-  initialData: Report;
+  initialData: Report | null;
 }
 
 const DraftEditForm = ({ reportId, initialData }: DraftEditFormProps) => {
@@ -34,14 +33,12 @@ const DraftEditForm = ({ reportId, initialData }: DraftEditFormProps) => {
     handleAddTask,
     handleRemoveTask,
     handleRemoveReport,
-    handleApiPut,
     handleApiPutDraft,
     handleApiPutDraftToPublished,
     handleBackToList,
     modalState,
     showErrorAlert,
-    isDirty,
-  } = useReportForm(transformReportToFormData(initialData));
+  } = useReportForm(transformReportToFormData(initialData)!);
 
   // モーダル表示時のスクロール禁止制御
   useScrollLock([modalState.isOpen]);
@@ -152,8 +149,8 @@ const DraftEditForm = ({ reportId, initialData }: DraftEditFormProps) => {
           message={modalState.message}
           confirmButtonText={modalState.confirmButtonText}
           cancelButtonText={modalState.cancelButtonText}
-          onClose={modalState.onClose}
-          onConfirm={modalState.onConfirm}
+          onClose={modalState.onClose || (() => { })}
+          onConfirm={modalState.onConfirm || (() => { })}
         />
       )}
     </div>

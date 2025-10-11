@@ -12,7 +12,7 @@ interface ConfirmationViewProps {
   isEditMode?: boolean;
 }
 
-const ConfirmationView = ({ formData, isConfirm = true, isEditMode = false }: ConfirmationViewProps) => {
+const ConfirmationView = ({ formData }: ConfirmationViewProps) => {
   return (
     <div className="space-y-8">
       <ConfirmationBasicInfoSection formData={formData} />

@@ -2,12 +2,13 @@ import { UseFormRegister } from "react-hook-form";
 import ErrorMessage from "./ErrorMessage";
 import Label from "./Label";
 import { getInputClass } from "@/utils/classHelper";
+import { FormData } from "@/schemas/reportSchema";
 
 interface DateRangeInputProps {
   label: string;
   isRequired?: boolean;
-  startDateRegister: ReturnType<UseFormRegister<any>>;
-  endDateRegister: ReturnType<UseFormRegister<any>>;
+  startDateRegister: ReturnType<UseFormRegister<FormData>>;
+  endDateRegister: ReturnType<UseFormRegister<FormData>>;
   startDateError?: string;
   endDateError?: string;
   className?: string;

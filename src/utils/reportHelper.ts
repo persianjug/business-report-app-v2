@@ -6,11 +6,11 @@ export const transformReportToFormData = (report: Report | null): FormData | nul
   if (!report) {
     return null;
   }
-  
+
   return {
     ...report,
     overallProgress: formatNewlines(report?.overallProgress),
-    futurePlans:  formatNewlines(report?.futurePlans),
+    futurePlans: formatNewlines(report?.futurePlans),
     tasks:
       report?.tasks.map((task: Task) => ({
         ...task,
@@ -47,5 +47,8 @@ export const transformFormDataToReport = (formData: FormData, reportId?: string 
       taskProblem: task.taskProblem,
     })),
     consultation: formData.consultation,
+    status: "",
+    createdAt: "",
+    updatedAt: "",
   };
 };

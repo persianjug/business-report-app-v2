@@ -18,7 +18,7 @@ import { transformReportToFormData } from "@/utils/reportHelper";
 
 interface EditFormProps {
   reportId: string | number;
-  initialData: Report;
+  initialData: Report | null;
 }
 
 const EditForm = ({ reportId, initialData }: EditFormProps) => {
@@ -39,7 +39,7 @@ const EditForm = ({ reportId, initialData }: EditFormProps) => {
     modalState,
     showErrorAlert,
     isDirty,
-  } = useReportForm(transformReportToFormData(initialData));
+  } = useReportForm(transformReportToFormData(initialData)!);
 
   // モーダル表示時のスクロール禁止制御
   useScrollLock([modalState.isOpen]);
@@ -142,7 +142,7 @@ const EditForm = ({ reportId, initialData }: EditFormProps) => {
             <Button
               type="button"
               variant="success"
-              onClick={() => handleApiPut(reportId)}>この内容で更新する</Button>
+              onClick={() => handleApiPut(reportId, "published")}>この内容で更新する</Button>
           </div>
         </div>
       )}
@@ -159,8 +159,8 @@ const EditForm = ({ reportId, initialData }: EditFormProps) => {
           message={modalState.message}
           confirmButtonText={modalState.confirmButtonText}
           cancelButtonText={modalState.cancelButtonText}
-          onClose={modalState.onClose}
-          onConfirm={modalState.onConfirm}
+          onClose={modalState.onClose || (() => { })}
+          onConfirm={modalState.onConfirm || (() => { })}
         />
       )}
     </div>

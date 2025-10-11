@@ -2,18 +2,18 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { isAuthenticated } from "@/utils/auth";
+// import { isAuthenticated } from "@/utils/auth";
 import Cookies from "js-cookie";
 
 export default function Header() {
   const router = useRouter();
-  const isAuth = isAuthenticated();
+  // const isAuth = isAuthenticated();
 
-  const handleLogout = () => {
-    localStorage.removeItem("jwtToken");
-    Cookies.remove("jwtToken");
-    router.push("/login");
-  };
+  // const handleLogout = () => {
+  //   localStorage.removeItem("jwtToken");
+  //   Cookies.remove("jwtToken");
+  //   router.push("/login");
+  // };
 
   return (
     <header className="bg-gray-800 text-white p-4">
@@ -21,7 +21,7 @@ export default function Header() {
         <Link href="/" className="text-xl font-bold">
           業務報告書システム
         </Link>
-        {isAuth ? (
+        {/* {isAuth ? (
           <div className="flex space-x-4 items-center">
             <Link href="/reports" className="hover:text-gray-300">
               報告書一覧
@@ -37,7 +37,7 @@ export default function Header() {
           <Link href="/login" className="bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-1 px-4 rounded text-sm">
             ログイン
           </Link>
-        )}
+        )} */}
       </nav>
     </header>
   );

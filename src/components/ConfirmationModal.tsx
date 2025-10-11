@@ -11,7 +11,8 @@ interface ConfirmationModalProps {
   children?: ReactNode;
   confirmButtonText?: string;
   cancelButtonText?: string;
-  variant?: "confirm" | "success" | "error" | "loading";
+  variant?: string;
+  // variant?: "confirm" | "success" | "error" | "loading";
 }
 
 const ConfirmationModal = ({
@@ -29,7 +30,6 @@ const ConfirmationModal = ({
 
   // モーダル開閉の制御
   useEffect(() => {
-    const body = document.body;
     if (isOpen) {
       dialogRef.current?.showModal();
     } else {
@@ -78,7 +78,7 @@ const ConfirmationModal = ({
         <Button
           variant="outline"
           onClick={onClose}
-          className="mt-3 w-full sm:mt-0 sm:w-auto"
+          // className="mt-3 w-full sm:mt-0 sm:w-auto"
         >
           {cancelButtonText}
         </Button>
@@ -86,7 +86,7 @@ const ConfirmationModal = ({
         <Button
           variant={getConfirmButtonVariant()}
           onClick={onConfirm}
-          className="w-full sm:ml-3 sm:w-auto"
+          // className="w-full sm:ml-3 sm:w-auto"
         >
           {confirmButtonText}
         </Button>

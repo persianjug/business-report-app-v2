@@ -1,4 +1,3 @@
-import { formatNewlines } from "@/utils/stringHelper";
 import React from "react";
 
 interface ConfirmationFieldProps {

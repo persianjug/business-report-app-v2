@@ -1,6 +1,6 @@
 import "./globals.css";
 import { Inter } from "next/font/google";
-import { Bounce, Slide, ToastContainer, Zoom } from "react-toastify";
+import { Bounce, ToastContainer } from "react-toastify";
 
 const inter = Inter({ subsets: ["latin"] });
 

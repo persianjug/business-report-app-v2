@@ -6,7 +6,7 @@ import { SubmitHandler, useFieldArray, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { reportSchema, FormData } from "@/schemas/reportSchema";
 import api from "@/utils/axios";
-import { getLatestReport, setDraftReport, setReport, updateDraftReport, updateReport, updateReportDraft, updateReportDraftToPublished } from "@/lib/report";
+import { getLatestReport, setDraftReport, setReport, updateReport, updateReportDraft, updateReportDraftToPublished } from "@/lib/report";
 import { transformFormDataToReport, transformReportToFormData } from "@/utils/reportHelper";
 import { useModal } from "./useModal";
 import { MAX_TASKS } from "@/Constants/reportConstants";
@@ -151,7 +151,7 @@ export const useReportForm = (initialData: FormData) => {
 
   // フォームの内容をリセット
   const performResetFormWithData = (data: FormData | null) => {
-    reset(data);
+    reset(data ?? undefined);
   };
 
   // 最新の報告書ロード処理
@@ -190,7 +190,7 @@ export const useReportForm = (initialData: FormData) => {
   };
 
   // 「確認画面へ進む」ボタン押下時のハンドラー
-  const handleSubmitToConfirm: SubmitHandler<FormData> = (formData: FormData) => {
+  const handleSubmitToConfirm: SubmitHandler<FormData> = () => {
     setShowErrorAlert(false); // 成功した場合はエラーアラートを非表示
     setStep("confirm");
   };

@@ -2,12 +2,13 @@ import { UseFormRegister } from "react-hook-form";
 import ErrorMessage from "./ErrorMessage";
 import Label from "./Label";
 import { getInputClass } from "@/utils/classHelper";
+import { FormData } from "@/schemas/reportSchema";
 
 interface CommuteTimeInputProps {
   label: string;
   isRequired?: boolean;
-  hoursRegister: ReturnType<UseFormRegister<any>>;
-  minutesRegister: ReturnType<UseFormRegister<any>>;
+  hoursRegister: ReturnType<UseFormRegister<FormData>>;
+  minutesRegister: ReturnType<UseFormRegister<FormData>>;
   hoursError?: string;
   minutesError?: string;
   className?: string;

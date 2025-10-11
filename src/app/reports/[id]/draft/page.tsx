@@ -1,7 +1,13 @@
 import DraftEditForm from "@/components/DraftEditForm";
 import { getReport } from "@/lib/report";
 
-const DraftEditReportPage = async ({ params }: { params: { id: string } }) => {
+interface DraftEditReportPageProps {
+  params: Promise<{
+    id: string
+  }>;
+}
+
+const DraftEditReportPage = async ({ params }: DraftEditReportPageProps) => {
   const { id: reportId } = await params;
   const initialData = await getReport(reportId);
   return (

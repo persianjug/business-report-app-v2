@@ -38,7 +38,7 @@ const ReportCard = ({ report }: ReportCardProps) => {
   const [startDateFormatted, startWeekday] = formatDateWithWeekday(report.startDate);
   const [endDateFormatted, endWeekday] = formatDateWithWeekday(report.endDate);
   const createdAtFormatted = formatUpdatedAt(report.createdAt);
-  const updatedAtFormatted = formatUpdatedAt(report.updateAt);
+  const updatedAtFormatted = formatUpdatedAt(report.updatedAt);
 
   return (
     <Link href={`/reports/${report.id}${report.status === "draft" ? "/draft" : ""}`}

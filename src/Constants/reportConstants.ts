@@ -46,7 +46,7 @@ export const REPORT_INITIAL_DATA: Report = {
     database: "",
   },
   overallProgress: "",
-  tasks: [{ taskName: "", status: "", problem: "" }],
+  tasks: [{ taskName: "", taskProgress: "", taskProblem: "" }],
   futurePlans: "",
   otherInfo: {
     customerStatus: "",
@@ -56,7 +56,8 @@ export const REPORT_INITIAL_DATA: Report = {
   },
   consultation: "",
   createdAt: "",
-  updateAt: ""
+  updatedAt: "",
+  status: ""
 }
 
 export type Tab = "published" | "drafts" | "all";

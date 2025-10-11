@@ -1,9 +1,10 @@
-import React, { ReactNode } from "react";
+import React, { ReactNode, MouseEvent } from "react";
 import { IconType } from "react-icons";
 
 interface ButtonProps {
   children: ReactNode;
-  onClick?: () => void;
+  // onClick?: () => void | Promise<void>;
+  onClick?: (event: MouseEvent<HTMLButtonElement>) => void | Promise<void>;
   variant?: "primary" | "secondary" | "success" | "danger" | "edit" | "outline";
   type?: "button" | "submit" | "reset";
   disabled?: boolean;

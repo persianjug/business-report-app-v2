@@ -8,7 +8,7 @@ export interface Report {
   tasks: Task[];
   futurePlans: string;
   otherInfo: OtherInfo;
-  consultation: string;
+  consultation: string | null;
   createdAt: string;
   updatedAt: string;
   status: string;
@@ -36,14 +36,14 @@ export interface ProjectInfo {
 export interface Task {
   taskName: string;
   taskProgress: string;
-  taskProblem: string;
+  taskProblem?: string | null;
 }
 
 export interface OtherInfo {
-  customerStatus: string;
-  salesInfo: string;
-  healthStatus: string;
-  vacationPlans: string;
+  customerStatus: string | null;
+  salesInfo: string | null;
+  healthStatus: string | null;
+  vacationPlans: string | null;
 }
 
 export interface PaginatedReports {

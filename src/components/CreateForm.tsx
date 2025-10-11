@@ -33,8 +33,7 @@ const CreateForm = () => {
     modalState,
     handleSaveAsDraft,
     showErrorAlert,
-    isDirty,
-  } = useReportForm(transformReportToFormData(REPORT_INITIAL_DATA));
+  } = useReportForm(transformReportToFormData(REPORT_INITIAL_DATA)!);
 
   // モーダル表示時のスクロール禁止制御
   useScrollLock([modalState.isOpen]);
@@ -148,8 +147,8 @@ const CreateForm = () => {
           message={modalState.message}
           confirmButtonText={modalState.confirmButtonText}
           cancelButtonText={modalState.cancelButtonText}
-          onClose={modalState.onClose}
-          onConfirm={modalState.onConfirm}
+          onClose={modalState.onClose || (() => { })}
+          onConfirm={modalState.onConfirm || (() => { })}
         />
       )}
     </div>

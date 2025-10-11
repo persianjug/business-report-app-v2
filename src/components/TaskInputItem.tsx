@@ -1,11 +1,12 @@
 import { UseFormRegister, FieldErrors } from "react-hook-form";
 import Input from "./Input";
 import Textarea from "./Textarea";
+import { FormData } from "@/schemas/reportSchema";
 
 interface TaskInputItemProps {
   index: number;
-  register: UseFormRegister<any>;
-  errors: FieldErrors<any>;
+  register: UseFormRegister<FormData>;
+  errors: FieldErrors<FormData>;
   onRemove: () => void;
   isRemovable: boolean;
 };

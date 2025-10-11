@@ -13,7 +13,7 @@ export const getReport = async (reportId: string | number): Promise<Report | nul
 
 export const getReports = async (): Promise<Report[] | null> => {
   try {
-    const res = await api.get<Report[]>("/reports", { cache: "no-store" });
+    const res = await api.get<Report[]>("/reports");
     return res.data;
   } catch (error) {
     console.error("APIから報告書を取得できませんでした:", error);
@@ -116,8 +116,8 @@ export const getPublishedReports = async (): Promise<Report[]> => {
   }
 };
 
-export const deleteReportTest = async (reportId: string | number): Promise<void> => {
-    console.info("報告書の削除に成功しました");
+export const deleteReportTest = async (): Promise<void> => {
+  console.info("報告書の削除に成功しました");
 }
 
 

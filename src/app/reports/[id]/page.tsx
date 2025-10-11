@@ -1,7 +1,13 @@
 import ReportDetail from "@/components/ReportDetail";
 import { getReport } from "@/lib/report";
 
-const ReportDetailPage = async ({ params }: { params: { id: string } }) => {
+interface ReportDetailPageProps {
+  params: Promise<{
+    id: string
+  }>;
+}
+
+const ReportDetailPage = async ({ params }: ReportDetailPageProps) => {
   const { id: reportId } = await params;
   const report = await getReport(reportId);
   return (

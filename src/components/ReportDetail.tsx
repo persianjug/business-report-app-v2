@@ -17,7 +17,7 @@ import { useScrollLock } from "@/hooks/useScrollLock";
 
 interface ReportDetailProps {
   reportId: string | number;
-  report: Report;
+  report: Report | null;
 }
 
 const ReportDetail = ({ reportId, report }: ReportDetailProps) => {
@@ -69,7 +69,7 @@ const ReportDetail = ({ reportId, report }: ReportDetailProps) => {
 
       {/* 明細 */}
       <div className="space-y-6 text-sm">
-        <ConfirmationView formData={transformReportToFormData(report)} isConfirm={false} />
+        <ConfirmationView formData={transformReportToFormData(report)!} isConfirm={false} />
       </div>
 
       {/* モーダル */}
@@ -81,8 +81,8 @@ const ReportDetail = ({ reportId, report }: ReportDetailProps) => {
           message={modalState.message}
           confirmButtonText={modalState.confirmButtonText}
           cancelButtonText={modalState.cancelButtonText}
-          onClose={modalState.onClose}
-          onConfirm={modalState.onConfirm}
+          onClose={modalState.onClose || (() => { })}
+          onConfirm={modalState.onConfirm || (() => { })}
         />
       )}
     </div>

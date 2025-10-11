@@ -27,9 +27,9 @@ export const reportSchema = yup.object().shape({
   projectInfo: yup.object().shape({
     projectName: yup.string().required("案件名は必須です。"),
     participationDate: yup.string().required("参画日は必須です。"),
-    numberOfParticipants: yup.number().min(1, "参画人数は1以上である必要があります。"),
-    commuteHours: yup.number().min(0, "時間は0以上である必要があります。"),
-    commuteMinutes: yup.number().min(0, "分は0以上である必要があります。").max(59, "分は59以下である必要があります。").nullable(),
+    numberOfParticipants: yup.number().min(1, "参画人数は1以上である必要があります。").required("参画人数は必須です。"),
+    commuteHours: yup.number().min(0, "時間は0以上である必要があります。").required("通勤時間（時）は必須です。"),
+    commuteMinutes: yup.number().min(0, "分は0以上である必要があります。").max(59, "分は59以下である必要があります。").required("通勤時間（分）は必須です。"),
     workStyle: yup.string().required("勤務形態は必須です。"),
     position: yup.string().required("ポジションは必須です。"),
     mainTechnology: yup.string().required("主要技術は必須です。"),
@@ -40,19 +40,19 @@ export const reportSchema = yup.object().shape({
     yup.object().shape({
       taskName: yup.string().required("タスク名は必須です。"),
       taskProgress: yup.string().required("状況は必須です。"),
-      taskProblem: yup.string().nullable(),
+      taskProblem: yup.string().nullable().defined(),
     })
   )
   .min(1, "タスクは最低1つは必要です。")
   .required("タスクは最低1つは必要です。"),
   futurePlans: yup.string().required("今後の予定は必須です。"),
   otherInfo: yup.object().shape({
-    customerStatus: yup.string().nullable(),
-    salesInfo: yup.string().nullable(),
-    healthStatus: yup.string().nullable(),
-    vacationPlans: yup.string().nullable(),
+    customerStatus: yup.string().nullable().defined(),
+    salesInfo: yup.string().nullable().defined(),
+    healthStatus: yup.string().nullable().defined(),
+    vacationPlans: yup.string().nullable().defined(),
   }),
-  consultation: yup.string().nullable().optional(),
+  consultation: yup.string().nullable().defined(),
 });
 
 export type FormData = yup.InferType<typeof reportSchema>;
